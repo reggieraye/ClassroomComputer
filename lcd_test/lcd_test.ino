@@ -230,7 +230,16 @@ void handleSortTitle(unsigned long now) {
     enterSortState(SORT_QUESTION);
   }
 }
-void handleSortQuestion(unsigned long now)   { /* TODO */ }
+void handleSortQuestion(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Bubble or merge:");
+  lcd.setCursor(0, 1);
+  lcd.print("which is faster?");
+
+  if (now - stateEnteredAt >= 1500UL) {
+    enterSortState(SORT_SELECT_SIZE);
+  }
+}
 void handleSortSelectSize(unsigned long now) { /* TODO */ }
 void handleSortShowN(unsigned long now)      { /* TODO */ }
 void handleSortConfirmN(unsigned long now)   { /* TODO */ }
