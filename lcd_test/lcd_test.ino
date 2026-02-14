@@ -149,8 +149,39 @@ void loop() {
   }
 }
 
-// ── Stub handlers (to be implemented) ────────────────────────────────────────
-void handleWelcome(unsigned long now)       { /* TODO */ }
+// ── Scroll helper ─────────────────────────────────────────────────────────────
+// Renders a 16-char window of str on the given LCD row, advancing one character
+// per tick.  scrollSpeed 0 = 100 ms/step (fastest), 5 = 350 ms/step (slowest).
+// Uses globals scrollOffset and scrollTickAt.
+void tickScroll(const char* str, uint8_t row, unsigned long now) {
+  int len   = strlen(str);
+  int cycle = len + 16;     // string length + 16-char blank gap before wrap
+
+  if (now >= scrollTickAt) {
+    scrollOffset = (scrollOffset + 1) % cycle;
+    scrollTickAt = now + 100UL + (unsigned long)scrollSpeed * 50UL;
+  }
+
+  lcd.setCursor(0, row);
+  for (int i = 0; i < 16; i++) {
+    int idx = scrollOffset + i;
+    lcd.write((idx < len) ? (uint8_t)str[idx] : (uint8_t)' ');
+  }
+}
+
+// ── handleWelcome ─────────────────────────────────────────────────────────────
+void handleWelcome(unsigned long now) {
+  tickScroll("Welcome to the Classroom Computer!", 0, now);
+
+  lcd.setCursor(0, 1);
+  lcd.print("(C) 2026 by R.R.");
+
+  if (now - stateEnteredAt >= 2500UL) {
+    enterAppState(APP_PROGRAM_SELECT);
+  }
+}
+
+// ── Remaining handlers (to be implemented) ────────────────────────────────────
 void handleProgramSelect(unsigned long now) { /* TODO */ }
 void handleSortTest(unsigned long now)      { /* TODO */ }
 void handlePrimes(unsigned long now)        { /* TODO */ }
