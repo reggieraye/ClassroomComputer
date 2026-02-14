@@ -30,7 +30,7 @@ enum AppState {
 // ── Sort Test program states ───────────────────────────────────────────────────
 enum SortTestState {
   SORT_TITLE,        // "Sort Test" for 0.75 s
-  SORT_QUESTION,     // "Is bubble or merge / sort faster?" for 1.5 s
+  SORT_QUESTION,     // "Bubble or merge: / which is faster?" for 1.5 s
   SORT_SELECT_SIZE,  // "Move slider to select problem size"
   SORT_SHOW_N,       // "N = [n]" until slider static for 0.75 s
   SORT_CONFIRM_N,    // "Starting sort for / N = [n]" for 1 s
@@ -187,7 +187,7 @@ void handleProgramSelect(unsigned long now) {
   tickScroll("Use the slider to select the program you wish to run", 0, now);
 
   lcd.setCursor(0, 1);
-  lcd.print("Sort test|Primes");  // 16 chars; spaces around | removed to fit
+  lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
 
   if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
     if (potValue <= 600) {
