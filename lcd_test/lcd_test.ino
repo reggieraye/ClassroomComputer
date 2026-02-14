@@ -95,3 +95,62 @@ void setup() {
   stateEnteredAt = millis();
   scrollTickAt   = millis();
 }
+
+// ── Pot deadband – absorbs ADC noise ──────────────────────────────────────────
+const int POT_DEADBAND = 8;
+
+// ── State-transition helpers ──────────────────────────────────────────────────
+// Common bookkeeping whenever we move to a new top-level or sort state.
+
+void enterAppState(AppState next) {
+  appState       = next;
+  stateEnteredAt = millis();
+  scrollOffset   = 0;
+  scrollTickAt   = millis();
+  potHasMoved    = false;
+  lcd.clear();
+}
+
+void enterSortState(SortTestState next) {
+  sortState      = next;
+  stateEnteredAt = millis();
+  scrollOffset   = 0;
+  scrollTickAt   = millis();
+  potHasMoved    = false;
+  lcd.clear();
+}
+
+// ── Handler forward declarations ──────────────────────────────────────────────
+void handleWelcome(unsigned long now);
+void handleProgramSelect(unsigned long now);
+void handleSortTest(unsigned long now);
+void handlePrimes(unsigned long now);
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+void loop() {
+  unsigned long now = millis();
+
+  // ── Read pot and detect movement ──────────────────────────────────────────
+  potValue = analogRead(POT_PIN);
+  if (abs(potValue - potValuePrev) > POT_DEADBAND) {
+    potLastMovedAt = now;
+    potHasMoved    = true;
+    potValuePrev   = potValue;
+  }
+  remappedPotValue = map(potValue, 0, 1023, 10, 500);
+
+  // ── Dispatch to current state handler ────────────────────────────────────
+  switch (appState) {
+    case APP_WELCOME:        handleWelcome(now);       break;
+    case APP_PROGRAM_SELECT: handleProgramSelect(now); break;
+    case APP_SORT_TEST:      handleSortTest(now);      break;
+    case APP_PRIMES:         handlePrimes(now);        break;
+  }
+}
+
+// ── Stub handlers (to be implemented) ────────────────────────────────────────
+void handleWelcome(unsigned long now)       { /* TODO */ }
+void handleProgramSelect(unsigned long now) { /* TODO */ }
+void handleSortTest(unsigned long now)      { /* TODO */ }
+void handlePrimes(unsigned long now)        { /* TODO */ }
