@@ -250,7 +250,17 @@ void handleSortSelectSize(unsigned long now) {
     enterSortState(SORT_SHOW_N);
   }
 }
-void handleSortShowN(unsigned long now)      { /* TODO */ }
+void handleSortShowN(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("N = ");
+  lcd.print(remappedPotValue);
+  lcd.print("     ");  // overwrite any leftover digits
+
+  if (potHasMoved && (now - potLastMovedAt >= 750UL)) {
+    confirmedN = remappedPotValue;
+    enterSortState(SORT_CONFIRM_N);
+  }
+}
 void handleSortConfirmN(unsigned long now)   { /* TODO */ }
 void handleSortRunning(unsigned long now)    { /* TODO */ }
 void handleSortResults(unsigned long now)    { /* TODO */ }
