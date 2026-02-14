@@ -126,6 +126,16 @@ void handleProgramSelect(unsigned long now);
 void handleSortTest(unsigned long now);
 void handlePrimes(unsigned long now);
 
+// ── Sort sub-handler forward declarations ─────────────────────────────────────
+void handleSortTitle(unsigned long now);
+void handleSortQuestion(unsigned long now);
+void handleSortSelectSize(unsigned long now);
+void handleSortShowN(unsigned long now);
+void handleSortConfirmN(unsigned long now);
+void handleSortRunning(unsigned long now);
+void handleSortResults(unsigned long now);
+void handleSortWinner(unsigned long now);
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 void loop() {
@@ -197,5 +207,26 @@ void handleProgramSelect(unsigned long now) {
     // 601-1023: Primes – do nothing for now
   }
 }
-void handleSortTest(unsigned long now)      { /* TODO */ }
+void handleSortTest(unsigned long now) {
+  switch (sortState) {
+    case SORT_TITLE:       handleSortTitle(now);       break;
+    case SORT_QUESTION:    handleSortQuestion(now);    break;
+    case SORT_SELECT_SIZE: handleSortSelectSize(now);  break;
+    case SORT_SHOW_N:      handleSortShowN(now);       break;
+    case SORT_CONFIRM_N:   handleSortConfirmN(now);    break;
+    case SORT_RUNNING:     handleSortRunning(now);     break;
+    case SORT_RESULTS:     handleSortResults(now);     break;
+    case SORT_WINNER:      handleSortWinner(now);      break;
+  }
+}
 void handlePrimes(unsigned long now)        { /* TODO */ }
+
+// ── Sort sub-handlers (to be implemented one at a time) ───────────────────────
+void handleSortTitle(unsigned long now)      { /* TODO */ }
+void handleSortQuestion(unsigned long now)   { /* TODO */ }
+void handleSortSelectSize(unsigned long now) { /* TODO */ }
+void handleSortShowN(unsigned long now)      { /* TODO */ }
+void handleSortConfirmN(unsigned long now)   { /* TODO */ }
+void handleSortRunning(unsigned long now)    { /* TODO */ }
+void handleSortResults(unsigned long now)    { /* TODO */ }
+void handleSortWinner(unsigned long now)     { /* TODO */ }
