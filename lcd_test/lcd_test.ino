@@ -182,6 +182,20 @@ void handleWelcome(unsigned long now) {
 }
 
 // ── Remaining handlers (to be implemented) ────────────────────────────────────
-void handleProgramSelect(unsigned long now) { /* TODO */ }
+// ── handleProgramSelect ───────────────────────────────────────────────────────
+void handleProgramSelect(unsigned long now) {
+  tickScroll("Use the slider to select the program you wish to run", 0, now);
+
+  lcd.setCursor(0, 1);
+  lcd.print("Sort test|Primes");  // 16 chars; spaces around | removed to fit
+
+  if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
+    if (potValue <= 600) {
+      sortState = SORT_TITLE;
+      enterAppState(APP_SORT_TEST);
+    }
+    // 601-1023: Primes – do nothing for now
+  }
+}
 void handleSortTest(unsigned long now)      { /* TODO */ }
 void handlePrimes(unsigned long now)        { /* TODO */ }
