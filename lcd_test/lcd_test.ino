@@ -222,7 +222,14 @@ void handleSortTest(unsigned long now) {
 void handlePrimes(unsigned long now)        { /* TODO */ }
 
 // ── Sort sub-handlers (to be implemented one at a time) ───────────────────────
-void handleSortTitle(unsigned long now)      { /* TODO */ }
+void handleSortTitle(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Sort Test");
+
+  if (now - stateEnteredAt >= 750UL) {
+    enterSortState(SORT_QUESTION);
+  }
+}
 void handleSortQuestion(unsigned long now)   { /* TODO */ }
 void handleSortSelectSize(unsigned long now) { /* TODO */ }
 void handleSortShowN(unsigned long now)      { /* TODO */ }
