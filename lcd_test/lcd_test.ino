@@ -59,9 +59,11 @@ const ColorStep colors[] = {
 };
 const int numColors = sizeof(colors) / sizeof(colors[0]);
 
+const int potPin = A0;
 int colorIndex = 0;
 
 void setup() {
+  Serial.begin(9600);
   lcd.begin(16, 2);
   lcd.createChar(0, heart);
   lcd.createChar(1, smiley);
@@ -94,6 +96,9 @@ void loop() {
   lcd.print(numColors);
   lcd.print("  ");
   lcd.write((byte)0);              // heart
+
+  int potValue = analogRead(potPin);
+  Serial.println(potValue);
 
   colorIndex = (colorIndex + 1) % numColors;
   delay(1500);
