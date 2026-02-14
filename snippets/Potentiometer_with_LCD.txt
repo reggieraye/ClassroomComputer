@@ -1,0 +1,25 @@
+#include <Wire.h> 
+#include "rgb_lcd.h" 
+
+rgb_lcd lcd; 
+
+const int colorR = 255; 
+const int colorG = 0; 
+const int colorB = 0; 
+const int potentiometer = A0;                    // rotary angle sensor connect to A0 
+
+void setup() {     
+  pinMode(potentiometer, INPUT);     // set up the LCD's number of columns and rows:     
+  lcd.begin(16, 2);     
+  lcd.setRGB(colorR, colorG, colorB); 
+} 
+
+void loop() {   
+  int sensorV = analogRead(potentiometer);  
+  int angle = map(sensorV, 0, 1023, 0, 20); // Map sensor value to 0-180 range  lcd.setCursor(0, 1);   
+  lcd.setCursor(0, 1);  
+  lcd.print(F("Angle = "));   
+  lcd.print(angle);   
+  lcd.print(F("       "));   
+  delay(200); 
+} 
