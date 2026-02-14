@@ -1,117 +1,97 @@
 #include <Wire.h>
 #include "rgb_lcd.h"
 
+// ── Hardware ──────────────────────────────────────────────────────────────────
 rgb_lcd lcd;
+const int POT_PIN    = A0;
+const int BUZZER_PIN = 2;
 
-#define BUZZER_PIN 2
+// ── Backlight colours ─────────────────────────────────────────────────────────
+const byte COL_PINK[3]  = {255,   0, 128};
+const byte COL_GREEN[3] = {  0, 255,   0};
 
-// Custom character: heart
-byte heart[8] = {
-  0b00000,
-  0b01010,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b01110,
-  0b00100,
-  0b00000
+// ── Scroll speed: 0 (fastest) – 5 (slowest) ──────────────────────────────────
+int scrollSpeed = 2;
+
+// ── Programs ──────────────────────────────────────────────────────────────────
+enum Program {
+  PROG_SORT_TEST,
+  PROG_PRIMES
 };
 
-// Custom character: smiley
-byte smiley[8] = {
-  0b00000,
-  0b01010,
-  0b01010,
-  0b00000,
-  0b10001,
-  0b01110,
-  0b00000,
-  0b00000
+// ── Top-level application states ──────────────────────────────────────────────
+enum AppState {
+  APP_WELCOME,
+  APP_PROGRAM_SELECT,
+  APP_SORT_TEST,
+  APP_PRIMES
 };
 
-// Custom character: note
-byte note[8] = {
-  0b00100,
-  0b00110,
-  0b00101,
-  0b00101,
-  0b00100,
-  0b11100,
-  0b11100,
-  0b00000
+// ── Sort Test program states ───────────────────────────────────────────────────
+enum SortTestState {
+  SORT_TITLE,        // "Sort Test" for 0.75 s
+  SORT_QUESTION,     // "Is bubble or merge / sort faster?" for 1.5 s
+  SORT_SELECT_SIZE,  // "Move slider to select problem size"
+  SORT_SHOW_N,       // "N = [n]" until slider static for 0.75 s
+  SORT_CONFIRM_N,    // "Starting sort for / N = [n]" for 1 s
+  SORT_RUNNING,      // "Bubble = TBD ms… / Merge = TBD ms…"
+  SORT_RESULTS,      // results for 2.5 s
+  SORT_WINNER        // "Merge sort is / the winner! X" for 2 s
 };
 
-// Each entry: { red, green, blue, label }
-struct ColorStep {
-  byte r, g, b;
-  const char* label;
+// ── Primes program states (placeholder) ───────────────────────────────────────
+enum PrimesState {
+  PRIMES_IDLE
 };
 
-const ColorStep colors[] = {
-  {255,   0,   0, "Red"},
-  {255, 128,   0, "Orange"},
-  {255, 255,   0, "Yellow"},
-  {  0, 255,   0, "Green"},
-  {  0, 128, 255, "Cyan"},
-  {  0,   0, 255, "Blue"},
-  {128,   0, 255, "Violet"},
-  {255,   0, 128, "Pink"},
-  { 40,  40,  40, "Dim White"},
-  {255, 255, 255, "Bright White"},
-};
-const int numColors = sizeof(colors) / sizeof(colors[0]);
+// ── Runtime state ─────────────────────────────────────────────────────────────
+AppState      appState    = APP_WELCOME;
+SortTestState sortState   = SORT_TITLE;
+PrimesState   primesState = PRIMES_IDLE;
+Program       activeProgram;          // set on selection
 
-const int potPin = A0;
-int colorIndex = 0;
+// ── Timing ────────────────────────────────────────────────────────────────────
+unsigned long stateEnteredAt = 0;   // millis() when current state began
+unsigned long potLastMovedAt = 0;   // millis() of last pot movement
+unsigned long scrollTickAt   = 0;   // millis() of next scroll step
+
+// ── Potentiometer ─────────────────────────────────────────────────────────────
+int  potValue         = 0;
+int  potValuePrev     = -1;    // -1 = no previous reading (sentinel)
+bool potHasMoved      = false; // has pot moved since entering current state?
+int  remappedPotValue = 10;    // pot value mapped to [10, 500]
+int  confirmedN       = 10;    // N locked in when leaving SORT_SHOW_N
+
+// ── Sort durations ────────────────────────────────────────────────────────────
+unsigned long bubbleDuration = 0;  // ms
+unsigned long mergeDuration  = 0;  // ms
+
+// ── Scroll state ──────────────────────────────────────────────────────────────
+int scrollOffset = 0;   // leading-character index into the scroll string
+
+// ── Celebratory animation frames (pulsing diamond, for SORT_WINNER) ───────────
+// All three are written into custom-char slot 0 in turn each animation tick.
+byte celebFrame0[8] = { 0b00100, 0b01110, 0b11111, 0b11111, 0b01110, 0b00100, 0b00000, 0b00000 };
+byte celebFrame1[8] = { 0b00000, 0b00100, 0b01110, 0b11111, 0b01110, 0b00100, 0b00000, 0b00000 };
+byte celebFrame2[8] = { 0b00000, 0b00000, 0b00100, 0b01110, 0b00100, 0b00000, 0b00000, 0b00000 };
+int           celebFrameIdx = 0;
+unsigned long celebTickAt   = 0;
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 void setup() {
   Serial.begin(9600);
+
   lcd.begin(16, 2);
-  lcd.createChar(0, heart);
-  lcd.createChar(1, smiley);
-  lcd.createChar(2, note);
+  lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
+  lcd.createChar(0, celebFrame0);  // slot 0 = animation frame (overwritten each tick)
 
-  // Startup buzzer sequence (ascending pitches)
   pinMode(BUZZER_PIN, OUTPUT);
-  tone(BUZZER_PIN, 400, 150);
-  delay(200);
-  tone(BUZZER_PIN, 600, 150);
-  delay(200);
-  tone(BUZZER_PIN, 800, 150);
-  delay(200);
-  noTone(BUZZER_PIN);
-}
 
-void loop() {
-  const ColorStep& c = colors[colorIndex];
+  // Seed potValuePrev so the first reading doesn't register as a spurious change
+  potValuePrev = analogRead(POT_PIN);
 
-  lcd.clear();
-  lcd.setRGB(c.r, c.g, c.b);
-
-  // Line 1: color name framed by special characters
-  lcd.setCursor(0, 0);
-  lcd.write((byte)0);              // heart
-  lcd.print(" ");
-  lcd.print(c.label);
-
-  // Pad and end with a note symbol
-  int pad = 14 - strlen(c.label);
-  for (int i = 0; i < pad; i++) lcd.print(" ");
-  lcd.write((byte)2);              // note
-
-  // Line 2: step counter + smiley
-  lcd.setCursor(0, 1);
-  lcd.write((byte)1);              // smiley
-  lcd.print(" Color ");
-  lcd.print(colorIndex + 1);
-  lcd.print("/");
-  lcd.print(numColors);
-  lcd.print("  ");
-  lcd.write((byte)0);              // heart
-
-  int potValue = analogRead(potPin);
-  Serial.println(potValue);
-
-  colorIndex = (colorIndex + 1) % numColors;
-  delay(1500);
+  // Stamp the start time for the welcome state
+  stateEnteredAt = millis();
+  scrollTickAt   = millis();
 }
