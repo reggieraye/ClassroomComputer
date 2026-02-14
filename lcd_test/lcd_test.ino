@@ -126,6 +126,16 @@ void handleProgramSelect(unsigned long now);
 void handleSortTest(unsigned long now);
 void handlePrimes(unsigned long now);
 
+// ── Sort sub-handler forward declarations ─────────────────────────────────────
+void handleSortTitle(unsigned long now);
+void handleSortQuestion(unsigned long now);
+void handleSortSelectSize(unsigned long now);
+void handleSortShowN(unsigned long now);
+void handleSortConfirmN(unsigned long now);
+void handleSortRunning(unsigned long now);
+void handleSortResults(unsigned long now);
+void handleSortWinner(unsigned long now);
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 void loop() {
@@ -197,5 +207,61 @@ void handleProgramSelect(unsigned long now) {
     // 601-1023: Primes – do nothing for now
   }
 }
-void handleSortTest(unsigned long now)      { /* TODO */ }
+void handleSortTest(unsigned long now) {
+  switch (sortState) {
+    case SORT_TITLE:       handleSortTitle(now);       break;
+    case SORT_QUESTION:    handleSortQuestion(now);    break;
+    case SORT_SELECT_SIZE: handleSortSelectSize(now);  break;
+    case SORT_SHOW_N:      handleSortShowN(now);       break;
+    case SORT_CONFIRM_N:   handleSortConfirmN(now);    break;
+    case SORT_RUNNING:     handleSortRunning(now);     break;
+    case SORT_RESULTS:     handleSortResults(now);     break;
+    case SORT_WINNER:      handleSortWinner(now);      break;
+  }
+}
 void handlePrimes(unsigned long now)        { /* TODO */ }
+
+// ── Sort sub-handlers (to be implemented one at a time) ───────────────────────
+void handleSortTitle(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Sort Test");
+
+  if (now - stateEnteredAt >= 750UL) {
+    enterSortState(SORT_QUESTION);
+  }
+}
+void handleSortQuestion(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Bubble or merge:");
+  lcd.setCursor(0, 1);
+  lcd.print("which is faster?");
+
+  if (now - stateEnteredAt >= 1500UL) {
+    enterSortState(SORT_SELECT_SIZE);
+  }
+}
+void handleSortSelectSize(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Move slider to  ");
+  lcd.setCursor(0, 1);
+  lcd.print("select prob size");
+
+  if (potHasMoved) {
+    enterSortState(SORT_SHOW_N);
+  }
+}
+void handleSortShowN(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("N = ");
+  lcd.print(remappedPotValue);
+  lcd.print("     ");  // overwrite any leftover digits
+
+  if (potHasMoved && (now - potLastMovedAt >= 750UL)) {
+    confirmedN = remappedPotValue;
+    enterSortState(SORT_CONFIRM_N);
+  }
+}
+void handleSortConfirmN(unsigned long now)   { /* TODO */ }
+void handleSortRunning(unsigned long now)    { /* TODO */ }
+void handleSortResults(unsigned long now)    { /* TODO */ }
+void handleSortWinner(unsigned long now)     { /* TODO */ }
