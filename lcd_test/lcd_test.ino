@@ -3,6 +3,8 @@
 
 rgb_lcd lcd;
 
+#define BUZZER_PIN 2
+
 // Custom character: heart
 byte heart[8] = {
   0b00000,
@@ -68,6 +70,16 @@ void setup() {
   lcd.createChar(0, heart);
   lcd.createChar(1, smiley);
   lcd.createChar(2, note);
+
+  // Startup buzzer sequence (ascending pitches)
+  pinMode(BUZZER_PIN, OUTPUT);
+  tone(BUZZER_PIN, 400, 150);
+  delay(200);
+  tone(BUZZER_PIN, 600, 150);
+  delay(200);
+  tone(BUZZER_PIN, 800, 150);
+  delay(200);
+  noTone(BUZZER_PIN);
 }
 
 void loop() {
