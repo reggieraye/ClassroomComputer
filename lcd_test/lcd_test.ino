@@ -230,7 +230,7 @@ void handleSortTitle(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Sort Test");
 
-  if (now - stateEnteredAt >= 750UL) {
+  if (now - stateEnteredAt >= 1750UL) {
     enterSortState(SORT_QUESTION);
   }
 }
