@@ -316,5 +316,19 @@ void handleSortRunning(unsigned long now) {
 
   enterSortState(SORT_RESULTS);
 }
-void handleSortResults(unsigned long now)    { /* TODO */ }
+void handleSortResults(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Bubble = ");
+  lcd.print(bubbleDuration);
+  lcd.print(" ms     ");  // trailing spaces overwrite leftover digits
+
+  lcd.setCursor(0, 1);
+  lcd.print("Merge  = ");
+  lcd.print(mergeDuration);
+  lcd.print(" ms     ");
+
+  if (now - stateEnteredAt >= 2500UL) {
+    enterSortState(SORT_WINNER);
+  }
+}
 void handleSortWinner(unsigned long now)     { /* TODO */ }
