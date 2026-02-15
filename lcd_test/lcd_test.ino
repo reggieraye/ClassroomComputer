@@ -10,7 +10,7 @@ const int BUZZER_PIN = 2;
 const byte COL_PINK[3]  = {255,   0, 128};
 const byte COL_GREEN[3] = {  0, 255,   0};
 
-// ── Scroll speed: 0 (fastest) – 5 (slowest) ──────────────────────────────────
+// ── Scroll speed: 1 (slowest) – 5 (fastest) ──────────────────────────────────
 int scrollSpeed = 2;
 
 // ── Programs ──────────────────────────────────────────────────────────────────
@@ -65,6 +65,10 @@ int  confirmedN       = 10;    // N locked in when leaving SORT_SHOW_N
 // ── Sort durations ────────────────────────────────────────────────────────────
 unsigned long bubbleDuration = 0;  // ms
 unsigned long mergeDuration  = 0;  // ms
+
+// ── Sort scratch buffers (max N = 500) ────────────────────────────────────────
+int sortBuf[500];
+int mergeTmp[500];
 
 // ── Scroll state ──────────────────────────────────────────────────────────────
 int scrollOffset = 0;   // leading-character index into the scroll string
@@ -169,7 +173,7 @@ void tickScroll(const char* str, uint8_t row, unsigned long now) {
 
   if (now >= scrollTickAt) {
     scrollOffset = (scrollOffset + 1) % cycle;
-    scrollTickAt = now + 100UL + (unsigned long)scrollSpeed * 50UL;
+    scrollTickAt = now + 100UL + (unsigned long)(6 - scrollSpeed) * 50UL;
   }
 
   lcd.setCursor(0, row);
@@ -194,7 +198,7 @@ void handleWelcome(unsigned long now) {
 // ── Remaining handlers (to be implemented) ────────────────────────────────────
 // ── handleProgramSelect ───────────────────────────────────────────────────────
 void handleProgramSelect(unsigned long now) {
-  tickScroll("Use the slider to select the program you wish to run", 0, now);
+  tickScroll("Use slider to select program", 0, now);
 
   lcd.setCursor(0, 1);
   lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
@@ -242,7 +246,7 @@ void handleSortQuestion(unsigned long now) {
 }
 void handleSortSelectSize(unsigned long now) {
   lcd.setCursor(0, 0);
-  lcd.print("Move slider to  ");
+  lcd.print("Move slider to");
   lcd.setCursor(0, 1);
   lcd.print("select prob size");
 
@@ -261,7 +265,97 @@ void handleSortShowN(unsigned long now) {
     enterSortState(SORT_CONFIRM_N);
   }
 }
-void handleSortConfirmN(unsigned long now)   { /* TODO */ }
-void handleSortRunning(unsigned long now)    { /* TODO */ }
-void handleSortResults(unsigned long now)    { /* TODO */ }
-void handleSortWinner(unsigned long now)     { /* TODO */ }
+void handleSortConfirmN(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Starting sort");
+  lcd.setCursor(0, 1);
+  lcd.print("for N = ");
+  lcd.print(confirmedN);
+  lcd.print("     ");  // clear any leftover digits
+
+  if (now - stateEnteredAt >= 1000UL) {
+    enterSortState(SORT_RUNNING);
+  }
+}
+// ── Sort algorithm helpers ────────────────────────────────────────────────────
+static void bubbleSort(int* a, int n) {
+  for (int i = 0; i < n - 1; i++)
+    for (int j = 0; j < n - 1 - i; j++)
+      if (a[j] > a[j+1]) { int t = a[j]; a[j] = a[j+1]; a[j+1] = t; }
+}
+
+static void mergeSortHelper(int* a, int* tmp, int n) {
+  if (n <= 1) return;
+  int mid = n / 2;
+  mergeSortHelper(a,       tmp, mid);
+  mergeSortHelper(a + mid, tmp, n - mid);
+  int i = 0, j = mid, k = 0;
+  while (i < mid && j < n) tmp[k++] = (a[i] <= a[j]) ? a[i++] : a[j++];
+  while (i < mid)           tmp[k++] = a[i++];
+  while (j < n)             tmp[k++] = a[j++];
+  for (int x = 0; x < n; x++) a[x] = tmp[x];
+}
+
+void handleSortRunning(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Bubble = TBD ms.");
+  lcd.setCursor(0, 1);
+  lcd.print("Merge  = TBD ms.");
+
+  // Bubble sort on a fresh random array
+  for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
+  unsigned long t0 = millis();
+  bubbleSort(sortBuf, confirmedN);
+  bubbleDuration = millis() - t0;
+
+  // Merge sort on a fresh random array
+  for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
+  t0 = millis();
+  mergeSortHelper(sortBuf, mergeTmp, confirmedN);
+  mergeDuration = millis() - t0;
+
+  enterSortState(SORT_RESULTS);
+}
+void handleSortResults(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Bubble = ");
+  lcd.print(bubbleDuration);
+  lcd.print(" ms     ");  // trailing spaces overwrite leftover digits
+
+  lcd.setCursor(0, 1);
+  lcd.print("Merge  = ");
+  lcd.print(mergeDuration);
+  lcd.print(" ms     ");
+
+  if (now - stateEnteredAt >= 2500UL) {
+    enterSortState(SORT_WINNER);
+  }
+}
+void handleSortWinner(unsigned long now) {
+  // Write static text once on entry; also reset animation
+  if (celebTickAt < stateEnteredAt) {
+    celebFrameIdx = 0;
+    lcd.createChar(0, celebFrame0);
+    lcd.setCursor(0, 0);
+    lcd.print("Merge sort is");
+    lcd.setCursor(0, 1);
+    lcd.print("the winner! ");
+    celebTickAt = stateEnteredAt + 200UL;
+  }
+
+  // Advance animation frame on each tick
+  if (now >= celebTickAt) {
+    celebFrameIdx = (celebFrameIdx + 1) % 3;
+    byte* frames[3] = {celebFrame0, celebFrame1, celebFrame2};
+    lcd.createChar(0, frames[celebFrameIdx]);
+    celebTickAt = now + 200UL;
+  }
+
+  // Redraw animated char at col 12, row 1 (createChar moves the cursor)
+  lcd.setCursor(12, 1);
+  lcd.write((uint8_t)0);
+
+  if (now - stateEnteredAt >= 2000UL) {
+    enterSortState(SORT_TITLE);
+  }
+}
