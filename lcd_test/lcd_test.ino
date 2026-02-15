@@ -249,7 +249,7 @@ void handleSortQuestion(unsigned long now) {
   lcd.setCursor(0, 1);
   lcd.print("which is faster?");
 
-  if (now - stateEnteredAt >= 1500UL) {
+  if (now - stateEnteredAt >= 2000UL) {
     enterSortState(SORT_SELECT_SIZE);
   }
 }
@@ -364,7 +364,7 @@ void handleSortWinner(unsigned long now) {
   lcd.setCursor(12, 1);
   lcd.write((uint8_t)0);
 
-  if (now - stateEnteredAt >= 2000UL) {
+  if (now - stateEnteredAt >= 3600UL) {
     enterAppState(APP_PROGRAM_SELECT);
   }
 }
