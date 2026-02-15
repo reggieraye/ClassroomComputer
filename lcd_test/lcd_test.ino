@@ -10,7 +10,7 @@ const int BUZZER_PIN = 2;
 const byte COL_PINK[3]  = {255,   0, 128};
 const byte COL_GREEN[3] = {  0, 255,   0};
 
-// ── Scroll speed: 0 (fastest) – 5 (slowest) ──────────────────────────────────
+// ── Scroll speed: 1 (slowest) – 5 (fastest) ──────────────────────────────────
 int scrollSpeed = 2;
 
 // ── Programs ──────────────────────────────────────────────────────────────────
@@ -173,7 +173,7 @@ void tickScroll(const char* str, uint8_t row, unsigned long now) {
 
   if (now >= scrollTickAt) {
     scrollOffset = (scrollOffset + 1) % cycle;
-    scrollTickAt = now + 100UL + (unsigned long)scrollSpeed * 50UL;
+    scrollTickAt = now + 100UL + (unsigned long)(6 - scrollSpeed) * 50UL;
   }
 
   lcd.setCursor(0, row);
