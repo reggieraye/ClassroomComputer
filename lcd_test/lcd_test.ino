@@ -331,4 +331,31 @@ void handleSortResults(unsigned long now) {
     enterSortState(SORT_WINNER);
   }
 }
-void handleSortWinner(unsigned long now)     { /* TODO */ }
+void handleSortWinner(unsigned long now) {
+  // Write static text once on entry; also reset animation
+  if (celebTickAt < stateEnteredAt) {
+    celebFrameIdx = 0;
+    lcd.createChar(0, celebFrame0);
+    lcd.setCursor(0, 0);
+    lcd.print("Merge sort is");
+    lcd.setCursor(0, 1);
+    lcd.print("the winner! ");
+    celebTickAt = stateEnteredAt + 200UL;
+  }
+
+  // Advance animation frame on each tick
+  if (now >= celebTickAt) {
+    celebFrameIdx = (celebFrameIdx + 1) % 3;
+    byte* frames[3] = {celebFrame0, celebFrame1, celebFrame2};
+    lcd.createChar(0, frames[celebFrameIdx]);
+    celebTickAt = now + 200UL;
+  }
+
+  // Redraw animated char at col 12, row 1 (createChar moves the cursor)
+  lcd.setCursor(12, 1);
+  lcd.write((uint8_t)0);
+
+  if (now - stateEnteredAt >= 2000UL) {
+    enterSortState(SORT_TITLE);
+  }
+}
