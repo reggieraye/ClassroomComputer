@@ -261,7 +261,18 @@ void handleSortShowN(unsigned long now) {
     enterSortState(SORT_CONFIRM_N);
   }
 }
-void handleSortConfirmN(unsigned long now)   { /* TODO */ }
+void handleSortConfirmN(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Starting sort");
+  lcd.setCursor(0, 1);
+  lcd.print("for N = ");
+  lcd.print(confirmedN);
+  lcd.print("     ");  // clear any leftover digits
+
+  if (now - stateEnteredAt >= 1000UL) {
+    enterSortState(SORT_RUNNING);
+  }
+}
 void handleSortRunning(unsigned long now)    { /* TODO */ }
 void handleSortResults(unsigned long now)    { /* TODO */ }
 void handleSortWinner(unsigned long now)     { /* TODO */ }
