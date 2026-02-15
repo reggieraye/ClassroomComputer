@@ -246,7 +246,7 @@ void handleSortQuestion(unsigned long now) {
 }
 void handleSortSelectSize(unsigned long now) {
   lcd.setCursor(0, 0);
-  lcd.print("Move slider to  ");
+  lcd.print("Move slider to");
   lcd.setCursor(0, 1);
   lcd.print("select prob size");
 
