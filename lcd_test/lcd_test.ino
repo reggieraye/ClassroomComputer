@@ -184,7 +184,7 @@ void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 8
 }
 
 // ── handleWelcome ─────────────────────────────────────────────────────────────
-// Layout: 0.75 s static, then 2.5 s scrolling (wrap gap 4). Total = 3.25 s.
+// Layout: 0.75 s static, then 3.75 s scrolling (wrap gap 4). Total = 4.5 s.
 void handleWelcome(unsigned long now) {
   const char* msg = "Welcome to the Classroom Computer!";
 
@@ -199,7 +199,7 @@ void handleWelcome(unsigned long now) {
   lcd.setCursor(0, 1);
   lcd.print("(C) 2026 by R.R.");
 
-  if (now - stateEnteredAt >= 3250UL) {
+  if (now - stateEnteredAt >= 4500UL) {
     enterAppState(APP_PROGRAM_SELECT);
   }
 }
@@ -207,7 +207,7 @@ void handleWelcome(unsigned long now) {
 // ── Remaining handlers (to be implemented) ────────────────────────────────────
 // ── handleProgramSelect ───────────────────────────────────────────────────────
 void handleProgramSelect(unsigned long now) {
-  tickScroll("Use slider to select program", 0, now, 8);
+  tickScroll("Use slider to select program", 0, now, 5);
 
   lcd.setCursor(0, 1);
   lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
@@ -249,7 +249,7 @@ void handleSortQuestion(unsigned long now) {
   lcd.setCursor(0, 1);
   lcd.print("which is faster?");
 
-  if (now - stateEnteredAt >= 1500UL) {
+  if (now - stateEnteredAt >= 2000UL) {
     enterSortState(SORT_SELECT_SIZE);
   }
 }
@@ -364,7 +364,7 @@ void handleSortWinner(unsigned long now) {
   lcd.setCursor(12, 1);
   lcd.write((uint8_t)0);
 
-  if (now - stateEnteredAt >= 2000UL) {
+  if (now - stateEnteredAt >= 3600UL) {
     enterAppState(APP_PROGRAM_SELECT);
   }
 }
