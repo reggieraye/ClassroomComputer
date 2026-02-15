@@ -66,6 +66,10 @@ int  confirmedN       = 10;    // N locked in when leaving SORT_SHOW_N
 unsigned long bubbleDuration = 0;  // ms
 unsigned long mergeDuration  = 0;  // ms
 
+// ── Sort scratch buffers (max N = 500) ────────────────────────────────────────
+int sortBuf[500];
+int mergeTmp[500];
+
 // ── Scroll state ──────────────────────────────────────────────────────────────
 int scrollOffset = 0;   // leading-character index into the scroll string
 
@@ -273,6 +277,44 @@ void handleSortConfirmN(unsigned long now) {
     enterSortState(SORT_RUNNING);
   }
 }
-void handleSortRunning(unsigned long now)    { /* TODO */ }
+// ── Sort algorithm helpers ────────────────────────────────────────────────────
+static void bubbleSort(int* a, int n) {
+  for (int i = 0; i < n - 1; i++)
+    for (int j = 0; j < n - 1 - i; j++)
+      if (a[j] > a[j+1]) { int t = a[j]; a[j] = a[j+1]; a[j+1] = t; }
+}
+
+static void mergeSortHelper(int* a, int* tmp, int n) {
+  if (n <= 1) return;
+  int mid = n / 2;
+  mergeSortHelper(a,       tmp, mid);
+  mergeSortHelper(a + mid, tmp, n - mid);
+  int i = 0, j = mid, k = 0;
+  while (i < mid && j < n) tmp[k++] = (a[i] <= a[j]) ? a[i++] : a[j++];
+  while (i < mid)           tmp[k++] = a[i++];
+  while (j < n)             tmp[k++] = a[j++];
+  for (int x = 0; x < n; x++) a[x] = tmp[x];
+}
+
+void handleSortRunning(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Bubble = TBD ms.");
+  lcd.setCursor(0, 1);
+  lcd.print("Merge  = TBD ms.");
+
+  // Bubble sort on a fresh random array
+  for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
+  unsigned long t0 = millis();
+  bubbleSort(sortBuf, confirmedN);
+  bubbleDuration = millis() - t0;
+
+  // Merge sort on a fresh random array
+  for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
+  t0 = millis();
+  mergeSortHelper(sortBuf, mergeTmp, confirmedN);
+  mergeDuration = millis() - t0;
+
+  enterSortState(SORT_RESULTS);
+}
 void handleSortResults(unsigned long now)    { /* TODO */ }
 void handleSortWinner(unsigned long now)     { /* TODO */ }
