@@ -11,7 +11,7 @@ const byte COL_PINK[3]  = {255,   0, 128};
 const byte COL_GREEN[3] = {  0, 255,   0};
 
 // ── Scroll speed: 1 (slowest) – 5 (fastest) ──────────────────────────────────
-int scrollSpeed = 2;
+int scrollSpeed = 1;
 
 // ── Programs ──────────────────────────────────────────────────────────────────
 enum Program {
@@ -169,7 +169,7 @@ void loop() {
 // Uses globals scrollOffset and scrollTickAt.
 void tickScroll(const char* str, uint8_t row, unsigned long now) {
   int len   = strlen(str);
-  int cycle = len + 16;     // string length + 16-char blank gap before wrap
+  int cycle = len + 8;      // string length + 8-char blank gap before wrap
 
   if (now >= scrollTickAt) {
     scrollOffset = (scrollOffset + 1) % cycle;
@@ -190,7 +190,7 @@ void handleWelcome(unsigned long now) {
   lcd.setCursor(0, 1);
   lcd.print("(C) 2026 by R.R.");
 
-  if (now - stateEnteredAt >= 2500UL) {
+  if (now - stateEnteredAt >= 3000UL) {
     enterAppState(APP_PROGRAM_SELECT);
   }
 }
