@@ -269,7 +269,7 @@ void handleSortShowN(unsigned long now) {
   lcd.print(remappedPotValue);
   lcd.print("     ");  // overwrite any leftover digits
 
-  if (potHasMoved && (now - potLastMovedAt >= 750UL)) {
+  if (potHasMoved && (now - potLastMovedAt >= 1300UL)) {
     confirmedN = remappedPotValue;
     enterSortState(SORT_CONFIRM_N);
   }
