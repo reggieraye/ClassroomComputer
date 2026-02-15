@@ -365,6 +365,6 @@ void handleSortWinner(unsigned long now) {
   lcd.write((uint8_t)0);
 
   if (now - stateEnteredAt >= 2000UL) {
-    enterSortState(SORT_TITLE);
+    enterAppState(APP_PROGRAM_SELECT);
   }
 }
