@@ -167,9 +167,9 @@ void loop() {
 // Renders a 16-char window of str on the given LCD row, advancing one character
 // per tick.  scrollSpeed 0 = 100 ms/step (fastest), 5 = 350 ms/step (slowest).
 // Uses globals scrollOffset and scrollTickAt.
-void tickScroll(const char* str, uint8_t row, unsigned long now) {
+void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 8) {
   int len   = strlen(str);
-  int cycle = len + 8;      // string length + 8-char blank gap before wrap
+  int cycle = len + wrapGap;  // string length + blank gap before wrap
 
   if (now >= scrollTickAt) {
     scrollOffset = (scrollOffset + 1) % cycle;
@@ -184,13 +184,22 @@ void tickScroll(const char* str, uint8_t row, unsigned long now) {
 }
 
 // ── handleWelcome ─────────────────────────────────────────────────────────────
+// Layout: 0.75 s static, then 2.5 s scrolling (wrap gap 4). Total = 3.25 s.
 void handleWelcome(unsigned long now) {
-  tickScroll("Welcome to the Classroom Computer!", 0, now);
+  const char* msg = "Welcome to the Classroom Computer!";
+
+  if (now - stateEnteredAt < 750UL) {
+    // Static display – show the first 16 characters before scrolling begins
+    lcd.setCursor(0, 0);
+    for (int i = 0; i < 16; i++) lcd.write((uint8_t)msg[i]);
+  } else {
+    tickScroll(msg, 0, now, 4);
+  }
 
   lcd.setCursor(0, 1);
   lcd.print("(C) 2026 by R.R.");
 
-  if (now - stateEnteredAt >= 3000UL) {
+  if (now - stateEnteredAt >= 3250UL) {
     enterAppState(APP_PROGRAM_SELECT);
   }
 }
@@ -198,7 +207,7 @@ void handleWelcome(unsigned long now) {
 // ── Remaining handlers (to be implemented) ────────────────────────────────────
 // ── handleProgramSelect ───────────────────────────────────────────────────────
 void handleProgramSelect(unsigned long now) {
-  tickScroll("Use slider to select program", 0, now);
+  tickScroll("Use slider to select program", 0, now, 8);
 
   lcd.setCursor(0, 1);
   lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
