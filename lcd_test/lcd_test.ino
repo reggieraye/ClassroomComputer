@@ -198,7 +198,7 @@ void handleWelcome(unsigned long now) {
 // ── Remaining handlers (to be implemented) ────────────────────────────────────
 // ── handleProgramSelect ───────────────────────────────────────────────────────
 void handleProgramSelect(unsigned long now) {
-  tickScroll("Use the slider to select the program you wish to run", 0, now);
+  tickScroll("Use slider to select program", 0, now);
 
   lcd.setCursor(0, 1);
   lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
