@@ -13,6 +13,9 @@ const byte COL_GREEN[3] = {  0, 255,   0};
 // ── Scroll speed: 1 (slowest) – 5 (fastest) ──────────────────────────────────
 int scrollSpeed = 3;
 
+// ── Delay before scrolling begins after entering a state ──────────────────────
+const unsigned long SCROLL_START_DELAY = 750UL;
+
 // ── Programs ──────────────────────────────────────────────────────────────────
 enum Program {
   PROG_SORT_TEST,
@@ -188,7 +191,7 @@ void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 8
 void handleWelcome(unsigned long now) {
   const char* msg = "Welcome to the Classroom Computer!";
 
-  if (now - stateEnteredAt < 750UL) {
+  if (now - stateEnteredAt < SCROLL_START_DELAY) {
     // Static display – show the first 16 characters before scrolling begins
     lcd.setCursor(0, 0);
     for (int i = 0; i < 16; i++) lcd.write((uint8_t)msg[i]);
@@ -206,7 +209,14 @@ void handleWelcome(unsigned long now) {
 
 // ── handleProgramSelect ───────────────────────────────────────────────────────
 void handleProgramSelect(unsigned long now) {
-  tickScroll("Use slider to select program", 0, now, 5);
+  const char* msg = "Use slider to select program";
+
+  if (now - stateEnteredAt < SCROLL_START_DELAY) {
+    lcd.setCursor(0, 0);
+    for (int i = 0; i < 16; i++) lcd.write((uint8_t)msg[i]);
+  } else {
+    tickScroll(msg, 0, now, 5);
+  }
 
   lcd.setCursor(0, 1);
   lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
