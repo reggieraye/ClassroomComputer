@@ -306,9 +306,9 @@ static void mergeSortHelper(int* a, int* tmp, int n) {
 
 void handleSortRunning(unsigned long now) {
   lcd.setCursor(0, 0);
-  lcd.print("Bubble = TBD ms..");
+  lcd.print("Bubble = X ms...");
   lcd.setCursor(0, 1);
-  lcd.print("Merge  = TBD ms..");
+  lcd.print("Merge = Y ms...");
 
   // Bubble sort on a fresh random array
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
