@@ -126,6 +126,7 @@ void enterSortState(SortTestState next) {
   scrollTickAt   = millis();
   potHasMoved    = false;
   if (next == SORT_RUNNING) lcd.setRGB(COL_GREEN[0], COL_GREEN[1], COL_GREEN[2]);
+  else                      lcd.setRGB(COL_PINK[0],  COL_PINK[1],  COL_PINK[2]);
   lcd.clear();
 }
 
