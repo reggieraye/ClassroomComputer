@@ -90,7 +90,6 @@ void setup() {
   Serial.begin(9600);
 
   lcd.begin(16, 2);
-  lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
   lcd.createChar(0, celebFrame0);  // slot 0 = animation frame (overwritten each tick)
 
   pinMode(BUZZER_PIN, OUTPUT);
@@ -115,7 +114,6 @@ void enterAppState(AppState next) {
   scrollOffset   = 0;
   scrollTickAt   = millis();
   potHasMoved    = false;
-  lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
   lcd.clear();
 }
 
@@ -125,7 +123,7 @@ void enterSortState(SortTestState next) {
   scrollOffset   = 0;
   scrollTickAt   = millis();
   potHasMoved    = false;
-  if (next == SORT_CONFIRM_N) lcd.setRGB(COL_GREEN[0], COL_GREEN[1], COL_GREEN[2]);
+  if (next == SORT_RUNNING) lcd.setRGB(COL_GREEN[0], COL_GREEN[1], COL_GREEN[2]);
   lcd.clear();
 }
 
