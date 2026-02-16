@@ -172,7 +172,7 @@ void loop() {
 // Renders a 16-char window of str on the given LCD row, advancing one character
 // per tick.  scrollSpeed 0 = 100 ms/step (fastest), 5 = 350 ms/step (slowest).
 // Uses globals scrollOffset and scrollTickAt.
-void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 8) {
+void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 4) {
   int len   = strlen(str);
   int cycle = len + wrapGap;  // string length + blank gap before wrap
 
@@ -217,7 +217,7 @@ void handleProgramSelect(unsigned long now) {
     lcd.setCursor(0, 0);
     for (int i = 0; i < 16; i++) lcd.write((uint8_t)msg[i]);
   } else {
-    tickScroll(msg, 0, now, 5);
+    tickScroll(msg, 0, now, 4);
   }
 
   lcd.setCursor(0, 1);
