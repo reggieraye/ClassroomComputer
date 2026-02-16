@@ -324,15 +324,15 @@ void handleSortRunning(unsigned long now) {
 
   // Bubble sort on a fresh random array
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
-  unsigned long t0 = millis();
+  unsigned long t0 = micros();
   bubbleSort(sortBuf, confirmedN);
-  bubbleDuration = millis() - t0;
+  bubbleDuration = (micros() - t0) / 1000UL;
 
   // Merge sort on a fresh random array
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
-  t0 = millis();
+  t0 = micros();
   mergeSortHelper(sortBuf, mergeTmp, confirmedN);
-  mergeDuration = millis() - t0;
+  mergeDuration = (micros() - t0) / 1000UL;
 
   enterSortState(SORT_RESULTS);
 }
