@@ -184,7 +184,7 @@ void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 8
 }
 
 // ── handleWelcome ─────────────────────────────────────────────────────────────
-// Layout: 0.75 s static, then 3.75 s scrolling (wrap gap 4). Total = 4.5 s.
+// Layout: 0.75 s static, then 5 s scrolling (wrap gap 4). Total = 5.75 s.
 void handleWelcome(unsigned long now) {
   const char* msg = "Welcome to the Classroom Computer!";
 
@@ -199,7 +199,7 @@ void handleWelcome(unsigned long now) {
   lcd.setCursor(0, 1);
   lcd.print("(C) 2026 by R.R.");
 
-  if (now - stateEnteredAt >= 4500UL) {
+  if (now - stateEnteredAt >= 5700UL) {
     enterAppState(APP_PROGRAM_SELECT);
   }
 }
@@ -307,9 +307,9 @@ static void mergeSortHelper(int* a, int* tmp, int n) {
 
 void handleSortRunning(unsigned long now) {
   lcd.setCursor(0, 0);
-  lcd.print("Bubble = TBD ms.");
+  lcd.print("Bubble = TBD ms..");
   lcd.setCursor(0, 1);
-  lcd.print("Merge  = TBD ms.");
+  lcd.print("Merge  = TBD ms..");
 
   // Bubble sort on a fresh random array
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
