@@ -152,7 +152,7 @@ void loop() {
     potHasMoved    = true;
     potValuePrev   = potValue;
   }
-  remappedPotValue = map(potValue, 0, 1023, 10, 500);
+  remappedPotValue = map(potValue, 0, 1023, 10, 350);
 
   // ── Dispatch to current state handler ────────────────────────────────────
   switch (appState) {
