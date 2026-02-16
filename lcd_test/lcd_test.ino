@@ -204,7 +204,6 @@ void handleWelcome(unsigned long now) {
   }
 }
 
-// ── Remaining handlers (to be implemented) ────────────────────────────────────
 // ── handleProgramSelect ───────────────────────────────────────────────────────
 void handleProgramSelect(unsigned long now) {
   tickScroll("Use slider to select program", 0, now, 5);
@@ -234,7 +233,7 @@ void handleSortTest(unsigned long now) {
 }
 void handlePrimes(unsigned long now)        { /* TODO */ }
 
-// ── Sort sub-handlers (to be implemented one at a time) ───────────────────────
+// ── Sort sub-handlers  ───────────────────────────────────────────────────────
 void handleSortTitle(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Sort Test");
