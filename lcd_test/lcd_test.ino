@@ -347,7 +347,7 @@ void handleSortResults(unsigned long now) {
   lcd.print(mergeDuration);
   lcd.print(" ms     ");
 
-  if (now - stateEnteredAt >= 2500UL) {
+  if (now - stateEnteredAt >= 3500UL) {
     enterSortState(SORT_WINNER);
   }
 }
