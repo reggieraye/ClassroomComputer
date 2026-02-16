@@ -11,7 +11,7 @@ const byte COL_PINK[3]  = {255,   0, 128};
 const byte COL_GREEN[3] = {  0, 255,   0};
 
 // ── Scroll speed: 1 (slowest) – 5 (fastest) ──────────────────────────────────
-int scrollSpeed = 1;
+int scrollSpeed = 2;
 
 // ── Programs ──────────────────────────────────────────────────────────────────
 enum Program {
