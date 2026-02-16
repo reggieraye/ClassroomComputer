@@ -183,8 +183,8 @@ void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 8
 
   lcd.setCursor(0, row);
   for (int i = 0; i < 16; i++) {
-    int idx = scrollOffset + i;
-    lcd.write((idx < len) ? (uint8_t)str[idx] : (uint8_t)' ');
+    int pos = (scrollOffset + i) % cycle;
+    lcd.write((pos < len) ? (uint8_t)str[pos] : (uint8_t)' ');
   }
 }
 
