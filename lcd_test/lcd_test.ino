@@ -184,7 +184,7 @@ void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 8
 }
 
 // ── handleWelcome ─────────────────────────────────────────────────────────────
-// Layout: 0.75 s static, then 5 s scrolling (wrap gap 4). Total = 5.75 s.
+// Layout: 0.75 s static, then 6 s scrolling (wrap gap 4). Total = 6.75 s.
 void handleWelcome(unsigned long now) {
   const char* msg = "Welcome to the Classroom Computer!";
 
@@ -199,7 +199,7 @@ void handleWelcome(unsigned long now) {
   lcd.setCursor(0, 1);
   lcd.print("(C) 2026 by R.R.");
 
-  if (now - stateEnteredAt >= 5700UL) {
+  if (now - stateEnteredAt >= 6750UL) {
     enterAppState(APP_PROGRAM_SELECT);
   }
 }
@@ -281,7 +281,7 @@ void handleSortConfirmN(unsigned long now) {
   lcd.print(confirmedN);
   lcd.print("     ");  // clear any leftover digits
 
-  if (now - stateEnteredAt >= 1000UL) {
+  if (now - stateEnteredAt >= 1300UL) {
     enterSortState(SORT_RUNNING);
   }
 }
