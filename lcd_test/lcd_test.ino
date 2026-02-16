@@ -125,7 +125,7 @@ void enterSortState(SortTestState next) {
   scrollOffset   = 0;
   scrollTickAt   = millis();
   potHasMoved    = false;
-  if (next == SORT_CONFIRM_N) lcd.setRGB(COL_GREEN[0], COL_GREEN[1], COL_GREEN[2]);
+  if (next == SORT_RUNNING) lcd.setRGB(COL_GREEN[0], COL_GREEN[1], COL_GREEN[2]);
   lcd.clear();
 }
 
@@ -183,8 +183,8 @@ void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 8
 
   lcd.setCursor(0, row);
   for (int i = 0; i < 16; i++) {
-    int idx = scrollOffset + i;
-    lcd.write((idx < len) ? (uint8_t)str[idx] : (uint8_t)' ');
+    int pos = (scrollOffset + i) % cycle;
+    lcd.write((pos < len) ? (uint8_t)str[pos] : (uint8_t)' ');
   }
 }
 
@@ -347,7 +347,7 @@ void handleSortResults(unsigned long now) {
   lcd.print(mergeDuration);
   lcd.print(" ms     ");
 
-  if (now - stateEnteredAt >= 2500UL) {
+  if (now - stateEnteredAt >= 3500UL) {
     enterSortState(SORT_WINNER);
   }
 }
