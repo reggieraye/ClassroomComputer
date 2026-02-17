@@ -526,13 +526,13 @@ void handleSortRunning(unsigned long now) {
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
   unsigned long t0 = micros();
   bubbleSort(sortBuf, confirmedN);
-  bubbleDuration = (micros() - t0) / 1000UL;
+  bubbleDuration = micros() - t0;
 
   // Merge sort on a fresh random array
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
   t0 = micros();
   mergeSortHelper(sortBuf, mergeTmp, confirmedN);
-  mergeDuration = (micros() - t0) / 1000UL;
+  mergeDuration = micros() - t0;
 
   enterSortState(SORT_RESULTS);
 }
@@ -540,12 +540,12 @@ void handleSortResults(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Bubble = ");
   lcd.print(bubbleDuration);
-  lcd.print(" ms     ");  // trailing spaces overwrite leftover digits
+  lcd.print(" us     ");  // trailing spaces overwrite leftover digits
 
   lcd.setCursor(0, 1);
   lcd.print("Merge  = ");
   lcd.print(mergeDuration);
-  lcd.print(" ms     ");
+  lcd.print(" us     ");
 
   if (now - stateEnteredAt >= 3500UL) {
     enterSortState(SORT_WINNER);
