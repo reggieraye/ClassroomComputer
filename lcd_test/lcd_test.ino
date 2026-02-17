@@ -85,7 +85,7 @@ int mergeTmp[500];
 // ── Scroll state ──────────────────────────────────────────────────────────────
 int scrollOffset = 0;   // leading-character index into the scroll string
 
-// ── Celebratory animation frames (pulsing diamond, for SORT_WINNER) ───────────
+// ── Celebratory animation frames (pulsing diamond, SORT_WINNER + PRIMES_RESULT)
 // All three are written into custom-char slot 0 in turn each animation tick.
 byte celebFrame0[8] = { 0b00100, 0b01110, 0b11111, 0b11111, 0b01110, 0b00100, 0b00000, 0b00000 };
 byte celebFrame1[8] = { 0b00000, 0b00100, 0b01110, 0b11111, 0b01110, 0b00100, 0b00000, 0b00000 };
@@ -267,7 +267,7 @@ void handleProgramSelect(unsigned long now) {
   lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
 
   if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
-    if (potValue <= 600) {
+    if (potValue <= 383) {
       sortState = SORT_TITLE;
       enterAppState(APP_SORT_TEST);
     } else {
@@ -381,7 +381,69 @@ void handlePrimesCalculating(unsigned long now) {
 
   enterPrimesState(PRIMES_RESULT);
 }
-void handlePrimesResult(unsigned long now)     { /* TODO – state 6 */ }
+// ── Ordinal suffix helper ────────────────────────────────────────────────────
+static const char* ordinalSuffix(int n) {
+  int mod100 = abs(n) % 100;
+  if (mod100 >= 11 && mod100 <= 13) return "th";
+  switch (abs(n) % 10) {
+    case 1:  return "st";
+    case 2:  return "nd";
+    case 3:  return "rd";
+    default: return "th";
+  }
+}
+
+// State 6 – "The [n]th prime / is [result] X" for 3.5 s.
+// Top line scrolls if >16 chars; bottom is always static with celeb animation.
+void handlePrimesResult(unsigned long now) {
+  // ── Top line ───────────────────────────────────────────────────────────────
+  char topLine[32];
+  snprintf(topLine, sizeof(topLine), "The %d%s prime", primesN, ordinalSuffix(primesN));
+  int topLen = strlen(topLine);
+
+  if (topLen <= 16) {
+    lcd.setCursor(0, 0);
+    lcd.print(topLine);
+  } else {
+    if (now - stateEnteredAt < SCROLL_START_DELAY) {
+      lcd.setCursor(0, 0);
+      for (int i = 0; i < 16; i++) lcd.write((uint8_t)topLine[i]);
+    } else {
+      tickScroll(topLine, 0, now, 4);
+    }
+  }
+
+  // ── Bottom line (always fits in 16) ────────────────────────────────────────
+  char botText[16];
+  snprintf(botText, sizeof(botText), "is %lu ", primesResult);
+  int celebCol = strlen(botText);
+
+  lcd.setCursor(0, 1);
+  lcd.print(botText);
+
+  // ── Celebratory animation (pulsing diamond) ───────────────────────────────
+  if (celebTickAt < stateEnteredAt) {
+    celebFrameIdx = 0;
+    lcd.createChar(0, celebFrame0);
+    celebTickAt = stateEnteredAt + 200UL;
+  }
+
+  if (now >= celebTickAt) {
+    celebFrameIdx = (celebFrameIdx + 1) % 3;
+    byte* frames[3] = {celebFrame0, celebFrame1, celebFrame2};
+    lcd.createChar(0, frames[celebFrameIdx]);
+    celebTickAt = now + 200UL;
+  }
+
+  // createChar moves the cursor, so reposition before writing the char
+  lcd.setCursor(celebCol, 1);
+  lcd.write((uint8_t)0);
+
+  // ── Timeout ────────────────────────────────────────────────────────────────
+  if (now - stateEnteredAt >= 3500UL) {
+    enterAppState(APP_PROGRAM_SELECT);
+  }
+}
 
 // ── Sort sub-handlers  ───────────────────────────────────────────────────────
 void handleSortTitle(unsigned long now) {
@@ -464,13 +526,13 @@ void handleSortRunning(unsigned long now) {
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
   unsigned long t0 = micros();
   bubbleSort(sortBuf, confirmedN);
-  bubbleDuration = (micros() - t0) / 1000UL;
+  bubbleDuration = micros() - t0;
 
   // Merge sort on a fresh random array
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
   t0 = micros();
   mergeSortHelper(sortBuf, mergeTmp, confirmedN);
-  mergeDuration = (micros() - t0) / 1000UL;
+  mergeDuration = micros() - t0;
 
   enterSortState(SORT_RESULTS);
 }
@@ -478,12 +540,12 @@ void handleSortResults(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Bubble = ");
   lcd.print(bubbleDuration);
-  lcd.print(" ms     ");  // trailing spaces overwrite leftover digits
+  lcd.print(" us     ");  // trailing spaces overwrite leftover digits
 
   lcd.setCursor(0, 1);
   lcd.print("Merge  = ");
   lcd.print(mergeDuration);
-  lcd.print(" ms     ");
+  lcd.print(" us     ");
 
   if (now - stateEnteredAt >= 3500UL) {
     enterSortState(SORT_WINNER);
