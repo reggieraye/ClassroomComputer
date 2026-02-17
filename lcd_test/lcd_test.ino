@@ -267,7 +267,7 @@ void handleProgramSelect(unsigned long now) {
   lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
 
   if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
-    if (potValue <= 600) {
+    if (potValue <= 383) {
       sortState = SORT_TITLE;
       enterAppState(APP_SORT_TEST);
     } else {
