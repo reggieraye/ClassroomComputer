@@ -173,19 +173,30 @@ void loop() {
 // Renders a 16-char window of str on the given LCD row, advancing one character
 // per tick.  scrollSpeed 0 = 100 ms/step (fastest), 5 = 350 ms/step (slowest).
 // Uses globals scrollOffset and scrollTickAt.
-void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 4) {
+// loop=true (default): wraps back to the start after wrapGap blank columns.
+// loop=false: scrolls once and holds on a blank screen when text is gone.
+void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 4, bool loop = true) {
   int len   = strlen(str);
-  int cycle = len + wrapGap;  // string length + blank gap before wrap
+  int cycle = len + wrapGap;
 
   if (now >= scrollTickAt) {
-    scrollOffset = (scrollOffset + 1) % cycle;
+    if (loop) {
+      scrollOffset = (scrollOffset + 1) % cycle;
+    } else {
+      if (scrollOffset < len) scrollOffset++;  // clamp: blank screen once text is gone
+    }
     scrollTickAt = now + 100UL + (unsigned long)(6 - scrollSpeed) * 50UL;
   }
 
   lcd.setCursor(0, row);
   for (int i = 0; i < 16; i++) {
-    int pos = (scrollOffset + i) % cycle;
-    lcd.write((pos < len) ? (uint8_t)str[pos] : (uint8_t)' ');
+    int idx = scrollOffset + i;
+    if (loop) {
+      int pos = idx % cycle;
+      lcd.write((pos < len) ? (uint8_t)str[pos] : (uint8_t)' ');
+    } else {
+      lcd.write((idx < len) ? (uint8_t)str[idx] : (uint8_t)' ');
+    }
   }
 }
 
@@ -199,7 +210,7 @@ void handleWelcome(unsigned long now) {
     lcd.setCursor(0, 0);
     for (int i = 0; i < 16; i++) lcd.write((uint8_t)msg[i]);
   } else {
-    tickScroll(msg, 0, now, 4);
+    tickScroll(msg, 0, now, 4, false);
   }
 
   lcd.setCursor(0, 1);
