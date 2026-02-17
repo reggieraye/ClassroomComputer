@@ -42,15 +42,20 @@ enum SortTestState {
   SORT_WINNER        // "Merge sort is / the winner! X" for 2 s
 };
 
-// ── Primes program states (placeholder) ───────────────────────────────────────
+// ── Primes program states ─────────────────────────────────────────────────────
 enum PrimesState {
-  PRIMES_IDLE
+  PRIMES_TITLE,        // "Calculate Primes" for 1 s
+  PRIMES_INTRO_1,      // "Choose the # of / primes calc'd" for 1.5 s
+  PRIMES_INTRO_2,      // "Move slider to / specify the #" for 1.5 s
+  PRIMES_SHOW_N,       // "N = [n]" until slider static for 1.3 s
+  PRIMES_CALCULATING,  // "Calc'ing the 1st / [n] primes" until done
+  PRIMES_RESULT        // "The [n]th prime / is [result] X" for 3.5 s
 };
 
 // ── Runtime state ─────────────────────────────────────────────────────────────
 AppState      appState    = APP_WELCOME;
 SortTestState sortState   = SORT_TITLE;
-PrimesState   primesState = PRIMES_IDLE;
+PrimesState   primesState = PRIMES_TITLE;
 Program       activeProgram;          // set on selection
 
 // ── Timing ────────────────────────────────────────────────────────────────────
@@ -64,6 +69,10 @@ int  potValuePrev     = -1;    // -1 = no previous reading (sentinel)
 bool potHasMoved      = false; // has pot moved since entering current state?
 int  remappedPotValue = 10;    // pot value mapped to [10, 500]
 int  confirmedN       = 10;    // N locked in when leaving SORT_SHOW_N
+
+// ── Primes data ───────────────────────────────────────────────────────────────
+int           primesN      = 500;  // locked-in N (how many primes to find)
+unsigned long primesResult = 0;    // the Nth prime, set by PRIMES_CALCULATING
 
 // ── Sort durations ────────────────────────────────────────────────────────────
 unsigned long bubbleDuration = 0;  // ms
@@ -130,11 +139,33 @@ void enterSortState(SortTestState next) {
   lcd.clear();
 }
 
+void enterPrimesState(PrimesState next) {
+  primesState    = next;
+  stateEnteredAt = millis();
+  scrollOffset   = 0;
+  scrollTickAt   = millis();
+  potHasMoved    = false;
+  // Green backlight from PRIMES_CALCULATING through PRIMES_RESULT; pink otherwise
+  if (next == PRIMES_CALCULATING || next == PRIMES_RESULT)
+    lcd.setRGB(COL_GREEN[0], COL_GREEN[1], COL_GREEN[2]);
+  else
+    lcd.setRGB(COL_PINK[0],  COL_PINK[1],  COL_PINK[2]);
+  lcd.clear();
+}
+
 // ── Handler forward declarations ──────────────────────────────────────────────
 void handleWelcome(unsigned long now);
 void handleProgramSelect(unsigned long now);
 void handleSortTest(unsigned long now);
 void handlePrimes(unsigned long now);
+
+// ── Primes sub-handler forward declarations ───────────────────────────────────
+void handlePrimesTitle(unsigned long now);
+void handlePrimesIntro1(unsigned long now);
+void handlePrimesIntro2(unsigned long now);
+void handlePrimesShowN(unsigned long now);
+void handlePrimesCalculating(unsigned long now);
+void handlePrimesResult(unsigned long now);
 
 // ── Sort sub-handler forward declarations ─────────────────────────────────────
 void handleSortTitle(unsigned long now);
@@ -239,8 +270,10 @@ void handleProgramSelect(unsigned long now) {
     if (potValue <= 600) {
       sortState = SORT_TITLE;
       enterAppState(APP_SORT_TEST);
+    } else {
+      primesState = PRIMES_TITLE;
+      enterAppState(APP_PRIMES);
     }
-    // 601-1023: Primes – do nothing for now
   }
 }
 void handleSortTest(unsigned long now) {
@@ -255,7 +288,35 @@ void handleSortTest(unsigned long now) {
     case SORT_WINNER:      handleSortWinner(now);      break;
   }
 }
-void handlePrimes(unsigned long now)        { /* TODO */ }
+void handlePrimes(unsigned long now) {
+  switch (primesState) {
+    case PRIMES_TITLE:       handlePrimesTitle(now);       break;
+    case PRIMES_INTRO_1:     handlePrimesIntro1(now);      break;
+    case PRIMES_INTRO_2:     handlePrimesIntro2(now);      break;
+    case PRIMES_SHOW_N:      handlePrimesShowN(now);       break;
+    case PRIMES_CALCULATING: handlePrimesCalculating(now); break;
+    case PRIMES_RESULT:      handlePrimesResult(now);      break;
+  }
+}
+
+// ── Primes sub-handlers ───────────────────────────────────────────────────────
+
+// State 1 – "Calculate Primes" for 1 s, then advance.
+// "Calculate Primes" is exactly 16 chars so no scrolling needed.
+void handlePrimesTitle(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Calculate Primes");
+
+  if (now - stateEnteredAt >= 1000UL) {
+    enterPrimesState(PRIMES_INTRO_1);
+  }
+}
+
+void handlePrimesIntro1(unsigned long now)     { /* TODO – state 2 */ }
+void handlePrimesIntro2(unsigned long now)     { /* TODO – state 3 */ }
+void handlePrimesShowN(unsigned long now)      { /* TODO – state 4 */ }
+void handlePrimesCalculating(unsigned long now){ /* TODO – state 5 */ }
+void handlePrimesResult(unsigned long now)     { /* TODO – state 6 */ }
 
 // ── Sort sub-handlers  ───────────────────────────────────────────────────────
 void handleSortTitle(unsigned long now) {
