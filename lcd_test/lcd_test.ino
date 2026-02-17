@@ -335,7 +335,21 @@ void handlePrimesIntro2(unsigned long now) {
     enterPrimesState(PRIMES_SHOW_N);
   }
 }
-void handlePrimesShowN(unsigned long now)      { /* TODO – state 4 */ }
+// State 4 – "N = [n]" with pot mapped to [500, 20000].
+// Locks in once slider is static for 1.3 s.
+void handlePrimesShowN(unsigned long now) {
+  int n = map(potValue, 0, 1023, 500, 20000);
+
+  lcd.setCursor(0, 0);
+  lcd.print("N = ");
+  lcd.print(n);
+  lcd.print("      ");  // overwrite leftover digits
+
+  if (potHasMoved && (now - potLastMovedAt >= 1300UL)) {
+    primesN = n;
+    enterPrimesState(PRIMES_CALCULATING);
+  }
+}
 void handlePrimesCalculating(unsigned long now){ /* TODO – state 5 */ }
 void handlePrimesResult(unsigned long now)     { /* TODO – state 6 */ }
 
