@@ -350,7 +350,37 @@ void handlePrimesShowN(unsigned long now) {
     enterPrimesState(PRIMES_CALCULATING);
   }
 }
-void handlePrimesCalculating(unsigned long now){ /* TODO – state 5 */ }
+// ── Prime helper ─────────────────────────────────────────────────────────────
+static bool isPrime(unsigned long n) {
+  if (n < 2) return false;
+  if (n == 2) return true;
+  if (n % 2 == 0) return false;
+  for (unsigned long i = 3; i * i <= n; i += 2) {
+    if (n % i == 0) return false;
+  }
+  return true;
+}
+
+// State 5 – "Calc'ing the 1st / [n] primes" while computing.
+// Blocks until the Nth prime is found, then transitions.
+void handlePrimesCalculating(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Calc'ing the 1st");
+  lcd.setCursor(0, 1);
+  lcd.print(primesN);
+  lcd.print(" primes");
+
+  // Find the primesN-th prime by trial division
+  unsigned long count = 1;       // 2 is the 1st prime
+  unsigned long candidate = 3;
+  while (count < (unsigned long)primesN) {
+    if (isPrime(candidate)) count++;
+    if (count < (unsigned long)primesN) candidate += 2;
+  }
+  primesResult = (primesN == 1) ? 2 : candidate;
+
+  enterPrimesState(PRIMES_RESULT);
+}
 void handlePrimesResult(unsigned long now)     { /* TODO – state 6 */ }
 
 // ── Sort sub-handlers  ───────────────────────────────────────────────────────
