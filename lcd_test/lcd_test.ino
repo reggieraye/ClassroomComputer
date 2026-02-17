@@ -9,7 +9,7 @@ const int BUZZER_PIN = 2;
 // ── Backlight colours ─────────────────────────────────────────────────────────
 const byte COL_PINK[3]  = {255,   0, 128};
 const byte COL_GREEN[3] = {  0, 255,   0};
-
+ 
 // ── Scroll speed: 1 (slowest) – 5 (fastest) ──────────────────────────────────
 int scrollSpeed = 3;
 
@@ -336,7 +336,7 @@ void handlePrimesIntro2(unsigned long now) {
   }
 }
 // State 4 – "N = [n]" with pot mapped to [500, 20000].
-// Locks in once slider is static for 1.3 s.
+// Locks in once slider is static for 1.5 s.
 void handlePrimesShowN(unsigned long now) {
   int n = map(potValue, 0, 1023, 30000, 100000);
 
@@ -345,7 +345,7 @@ void handlePrimesShowN(unsigned long now) {
   lcd.print(n);
   lcd.print("      ");  // overwrite leftover digits
 
-  if (potHasMoved && (now - potLastMovedAt >= 1300UL)) {
+  if (potHasMoved && (now - potLastMovedAt >= 1500UL)) {
     primesN = n;
     enterPrimesState(PRIMES_CALCULATING);
   }
@@ -393,7 +393,7 @@ static const char* ordinalSuffix(int n) {
   }
 }
 
-// State 6 – "The [n]th prime / is [result] X" for 3.5 s.
+// State 6 – "The [n]th prime / is [result] X" for 4.5 s.
 // Top line scrolls if >16 chars; bottom is always static with celeb animation.
 void handlePrimesResult(unsigned long now) {
   // ── Top line ───────────────────────────────────────────────────────────────
@@ -440,7 +440,7 @@ void handlePrimesResult(unsigned long now) {
   lcd.write((uint8_t)0);
 
   // ── Timeout ────────────────────────────────────────────────────────────────
-  if (now - stateEnteredAt >= 3500UL) {
+  if (now - stateEnteredAt >= 4500UL) {
     enterAppState(APP_PROGRAM_SELECT);
   }
 }
