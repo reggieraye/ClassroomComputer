@@ -312,8 +312,29 @@ void handlePrimesTitle(unsigned long now) {
   }
 }
 
-void handlePrimesIntro1(unsigned long now)     { /* TODO – state 2 */ }
-void handlePrimesIntro2(unsigned long now)     { /* TODO – state 3 */ }
+// State 2 – "Choose the # of / primes calc'd" for 1.5 s
+void handlePrimesIntro1(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Choose the # of");
+  lcd.setCursor(0, 1);
+  lcd.print("primes calc'd");
+
+  if (now - stateEnteredAt >= 1500UL) {
+    enterPrimesState(PRIMES_INTRO_2);
+  }
+}
+
+// State 3 – "Move slider to / specify the #" for 1.5 s
+void handlePrimesIntro2(unsigned long now) {
+  lcd.setCursor(0, 0);
+  lcd.print("Move slider to");
+  lcd.setCursor(0, 1);
+  lcd.print("specify the #");
+
+  if (now - stateEnteredAt >= 1500UL) {
+    enterPrimesState(PRIMES_SHOW_N);
+  }
+}
 void handlePrimesShowN(unsigned long now)      { /* TODO – state 4 */ }
 void handlePrimesCalculating(unsigned long now){ /* TODO – state 5 */ }
 void handlePrimesResult(unsigned long now)     { /* TODO – state 6 */ }
