@@ -338,7 +338,7 @@ void handlePrimesIntro2(unsigned long now) {
 // State 4 – "N = [n]" with pot mapped to [500, 20000].
 // Locks in once slider is static for 1.3 s.
 void handlePrimesShowN(unsigned long now) {
-  int n = map(potValue, 0, 1023, 500, 20000);
+  int n = map(potValue, 0, 1023, 30000, 100000);
 
   lcd.setCursor(0, 0);
   lcd.print("N = ");
