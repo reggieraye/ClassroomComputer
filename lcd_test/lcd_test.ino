@@ -37,7 +37,7 @@ enum SortTestState {
   SORT_SELECT_SIZE,  // "Move slider to select problem size"
   SORT_SHOW_N,       // "N = [n]" until slider static for 0.75 s
   SORT_CONFIRM_N,    // "Starting sort for / N = [n]" for 1 s
-  SORT_RUNNING,      // "Bubble = TBD ms… / Merge = TBD ms…"
+  SORT_RUNNING,      // "Bubble = TBD us… / Merge = TBD us…"
   SORT_RESULTS,      // results for 2.5 s
   SORT_WINNER        // "Merge sort is / the winner! X" for 2 s
 };
@@ -330,9 +330,9 @@ static void mergeSortHelper(int* a, int* tmp, int n) {
 
 void handleSortRunning(unsigned long now) {
   lcd.setCursor(0, 0);
-  lcd.print("Bubble = X ms...");
+  lcd.print("Bubble = X μs...");
   lcd.setCursor(0, 1);
-  lcd.print("Merge = Y ms...");
+  lcd.print("Merge = Y μs...");
 
   // Bubble sort on a fresh random array
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
