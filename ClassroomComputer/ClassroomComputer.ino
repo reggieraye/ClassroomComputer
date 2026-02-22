@@ -97,8 +97,8 @@ void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 4
 
 // ── State-transition helper ──────────────────────────────────────────────────
 // Common bookkeeping whenever we move to a new top-level state.
-void enterAppState(AppState next) {
-  appState       = next;
+void enterAppState(int next) {
+  appState       = (AppState)next;
   stateEnteredAt = millis();
   scrollOffset   = 0;
   scrollTickAt   = millis();
