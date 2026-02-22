@@ -103,6 +103,8 @@ void handleSortTest(unsigned long now) {
 
 // ── Sort sub-handlers ─────────────────────────────────────────────────────────
 
+// State 1 – "Sort Test" for 1.75 s, then advance.
+// Only 9 chars so no scrolling needed.
 static void handleSortTitle(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Sort Test");
@@ -112,6 +114,8 @@ static void handleSortTitle(unsigned long now) {
   }
 }
 
+// State 2 – "Bubble or merge: / which is faster?" for 2 s.
+// Both lines fit in 16 chars exactly.
 static void handleSortQuestion(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Bubble or merge:");
@@ -123,6 +127,8 @@ static void handleSortQuestion(unsigned long now) {
   }
 }
 
+// State 3 – "Move slider to / select prob size" until pot moves.
+// Instructions fit in 16 chars.
 static void handleSortSelectSize(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Move slider to");
@@ -134,6 +140,8 @@ static void handleSortSelectSize(unsigned long now) {
   }
 }
 
+// State 4 – "N = [n]" with pot mapped to [10, 350].
+// Locks in once slider is static for 1.3 s.
 static void handleSortShowN(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("N = ");
@@ -146,6 +154,8 @@ static void handleSortShowN(unsigned long now) {
   }
 }
 
+// State 5 – "Starting sort / for N = [n]" for 1.3 s.
+// Confirmation message before running the test.
 static void handleSortConfirmN(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Starting sort");
@@ -159,6 +169,8 @@ static void handleSortConfirmN(unsigned long now) {
   }
 }
 
+// State 6 – "Bubble = X µs... / Merge = Y µs..." while computing.
+// Blocks while running both sorts, then transitions immediately.
 static void handleSortRunning(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Bubble = X ");
@@ -184,6 +196,8 @@ static void handleSortRunning(unsigned long now) {
   enterSortState(SORT_RESULTS);
 }
 
+// State 7 – "Bubble = [time] µs / Merge  = [time] µs" for 3.5 s.
+// Displays actual measured times in microseconds.
 static void handleSortResults(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Bubble = ");
@@ -204,6 +218,8 @@ static void handleSortResults(unsigned long now) {
   }
 }
 
+// State 8 – "Merge sort is / the winner! X" for 3.6 s.
+// Static text with pulsing diamond animation at end of bottom line.
 static void handleSortWinner(unsigned long now) {
   // Write static text once on entry; also reset animation
   if (celebTickAt < stateEnteredAt) {
