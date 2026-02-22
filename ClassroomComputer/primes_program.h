@@ -173,7 +173,7 @@ static void handlePrimesCalculating(unsigned long now) {
   enterPrimesState(PRIMES_RESULT);
 }
 
-// State 6 – "The [n]th prime / is [result] X" for 4.5 s.
+// State 6 – "The [n]th prime / is [result] X" for 6.0 s.
 // Top line scrolls if >16 chars; bottom is always static with celeb animation.
 static void handlePrimesResult(unsigned long now) {
   // ── Top line ───────────────────────────────────────────────────────────────
@@ -220,7 +220,7 @@ static void handlePrimesResult(unsigned long now) {
   lcd.write((uint8_t)0);
 
   // ── Timeout ────────────────────────────────────────────────────────────────
-  if (now - stateEnteredAt >= 4500UL) {
+  if (now - stateEnteredAt >= 6000UL) {
     enterAppState(1);  // APP_PROGRAM_SELECT = 1
   }
 }
