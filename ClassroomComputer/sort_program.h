@@ -161,9 +161,13 @@ static void handleSortConfirmN(unsigned long now) {
 
 static void handleSortRunning(unsigned long now) {
   lcd.setCursor(0, 0);
-  lcd.print("Bubble = X us...");
+  lcd.print("Bubble = X ");
+  lcd.write(1);  // µ custom character
+  lcd.print("s...");
   lcd.setCursor(0, 1);
-  lcd.print("Merge = Y us...");
+  lcd.print("Merge = Y ");
+  lcd.write(1);  // µ custom character
+  lcd.print("s...");
 
   // Bubble sort on a fresh random array
   for (int i = 0; i < confirmedN; i++) sortBuf[i] = random(10000);
@@ -184,12 +188,16 @@ static void handleSortResults(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Bubble = ");
   lcd.print(bubbleDuration);
-  lcd.print(" us     ");  // trailing spaces overwrite leftover digits
+  lcd.print(" ");
+  lcd.write(1);  // µ custom character
+  lcd.print("s     ");  // trailing spaces overwrite leftover digits
 
   lcd.setCursor(0, 1);
   lcd.print("Merge  = ");
   lcd.print(mergeDuration);
-  lcd.print(" us     ");
+  lcd.print(" ");
+  lcd.write(1);  // µ custom character
+  lcd.print("s     ");
 
   if (now - stateEnteredAt >= 3500UL) {
     enterSortState(SORT_WINNER);

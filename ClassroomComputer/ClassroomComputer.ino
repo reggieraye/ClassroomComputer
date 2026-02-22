@@ -57,6 +57,10 @@ byte celebFrame2[8] = { 0b00000, 0b00000, 0b00100, 0b01110, 0b00100, 0b00000, 0b
 int           celebFrameIdx = 0;
 unsigned long celebTickAt   = 0;
 
+// ── Micro (µ) symbol custom character ─────────────────────────────────────────
+// Custom character slot 1 = µ (mu) for microseconds display
+byte microChar[8] = { 0b00000, 0b01010, 0b01010, 0b01010, 0b01110, 0b01000, 0b01000, 0b00000 };
+
 // ── Pot deadband – absorbs ADC noise ──────────────────────────────────────────
 const int POT_DEADBAND = 8;
 
@@ -117,6 +121,7 @@ void setup() {
   lcd.begin(16, 2);
   lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
   lcd.createChar(0, celebFrame0);  // slot 0 = animation frame (overwritten each tick)
+  lcd.createChar(1, microChar);    // slot 1 = µ (micro) symbol
 
   pinMode(BUZZER_PIN, OUTPUT);
 
