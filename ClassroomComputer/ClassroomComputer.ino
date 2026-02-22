@@ -109,6 +109,13 @@ void enterAppState(int next) {
   potHasMoved    = false;
   lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
   lcd.clear();
+
+  // Reset program-specific states to their initial values
+  if (next == APP_PRIMES) {
+    enterPrimesState(PRIMES_TITLE);
+  } else if (next == APP_SORT_TEST) {
+    enterSortState(SORT_TITLE);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
