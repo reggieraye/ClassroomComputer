@@ -2,6 +2,7 @@
 #include "rgb_lcd.h"
 #include "sort_program.h"
 #include "primes_program.h"
+#include "calculator_program.h"
 
 // ══════════════════════════════════════════════════════════════════════════════
 // HARDWARE
@@ -30,7 +31,8 @@ enum AppState {
   APP_WELCOME,
   APP_PROGRAM_SELECT,
   APP_SORT_TEST,
-  APP_PRIMES
+  APP_PRIMES,
+  APP_CALCULATOR
 };
 
 AppState appState = APP_WELCOME;
@@ -115,6 +117,8 @@ void enterAppState(int next) {
     enterPrimesState(PRIMES_TITLE);
   } else if (next == APP_SORT_TEST) {
     enterSortState(SORT_TITLE);
+  } else if (next == APP_CALCULATOR) {
+    enterCalcState(CALC_TITLE);
   }
 }
 
@@ -158,6 +162,7 @@ void loop() {
     case APP_PROGRAM_SELECT: handleProgramSelect(now); break;
     case APP_SORT_TEST:      handleSortTest(now);      break;
     case APP_PRIMES:         handlePrimes(now);        break;
+    case APP_CALCULATOR:     handleCalculator(now);    break;
   }
 }
 
@@ -198,13 +203,15 @@ void handleProgramSelect(unsigned long now) {
   }
 
   lcd.setCursor(0, 1);
-  lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
+  lcd.print("Sort|Prime|Calc ");  // 16 chars padded to clear any leftover chars
 
   if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
-    if (potValue <= 383) {
+    if (potValue <= 341) {
       enterAppState(APP_SORT_TEST);
-    } else {
+    } else if (potValue <= 682) {
       enterAppState(APP_PRIMES);
+    } else {
+      enterAppState(APP_CALCULATOR);
     }
   }
 }
