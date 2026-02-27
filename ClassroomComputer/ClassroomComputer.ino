@@ -2,6 +2,7 @@
 #include "rgb_lcd.h"
 #include "sort_program.h"
 #include "primes_program.h"
+#include "calculator_program.h"
 
 // ══════════════════════════════════════════════════════════════════════════════
 // HARDWARE
@@ -30,7 +31,8 @@ enum AppState {
   APP_WELCOME,
   APP_PROGRAM_SELECT,
   APP_SORT_TEST,
-  APP_PRIMES
+  APP_PRIMES,
+  APP_CALCULATOR
 };
 
 AppState appState = APP_WELCOME;
@@ -56,6 +58,10 @@ byte celebFrame1[8] = { 0b00000, 0b00100, 0b01110, 0b11111, 0b01110, 0b00100, 0b
 byte celebFrame2[8] = { 0b00000, 0b00000, 0b00100, 0b01110, 0b00100, 0b00000, 0b00000, 0b00000 };
 int           celebFrameIdx = 0;
 unsigned long celebTickAt   = 0;
+
+// ── Micro (µ) symbol custom character ─────────────────────────────────────────
+// Custom character slot 1 = µ (mu) for microseconds display
+byte microChar[8] = { 0b00000, 0b01010, 0b01010, 0b01010, 0b01110, 0b01000, 0b01000, 0b00000 };
 
 // ── Pot deadband – absorbs ADC noise ──────────────────────────────────────────
 const int POT_DEADBAND = 8;
@@ -105,6 +111,15 @@ void enterAppState(int next) {
   potHasMoved    = false;
   lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
   lcd.clear();
+
+  // Reset program-specific states to their initial values
+  if (next == APP_PRIMES) {
+    enterPrimesState(PRIMES_TITLE);
+  } else if (next == APP_SORT_TEST) {
+    enterSortState(SORT_TITLE);
+  } else if (next == APP_CALCULATOR) {
+    enterCalcState(CALC_TITLE);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -117,6 +132,7 @@ void setup() {
   lcd.begin(16, 2);
   lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
   lcd.createChar(0, celebFrame0);  // slot 0 = animation frame (overwritten each tick)
+  lcd.createChar(1, microChar);    // slot 1 = µ (micro) symbol
 
   pinMode(BUZZER_PIN, OUTPUT);
 
@@ -146,6 +162,7 @@ void loop() {
     case APP_PROGRAM_SELECT: handleProgramSelect(now); break;
     case APP_SORT_TEST:      handleSortTest(now);      break;
     case APP_PRIMES:         handlePrimes(now);        break;
+    case APP_CALCULATOR:     handleCalculator(now);    break;
   }
 }
 
@@ -186,13 +203,15 @@ void handleProgramSelect(unsigned long now) {
   }
 
   lcd.setCursor(0, 1);
-  lcd.print("Sort | Primes   ");  // 16 chars padded to clear any leftover chars
+  lcd.print("Sort|Prime|Calc ");  // 16 chars padded to clear any leftover chars
 
   if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
-    if (potValue <= 383) {
+    if (potValue <= 341) {
       enterAppState(APP_SORT_TEST);
-    } else {
+    } else if (potValue <= 682) {
       enterAppState(APP_PRIMES);
+    } else {
+      enterAppState(APP_CALCULATOR);
     }
   }
 }
