@@ -22,6 +22,7 @@
 #include "primes_program.h"
 #include "calculator_program.h"
 #include "paddle_game.h"
+#include "asi_program.h"
 
 // ══════════════════════════════════════════════════════════════════════════════
 // HARDWARE
@@ -55,7 +56,8 @@ enum AppState {
   APP_SORT_TEST,
   APP_PRIMES,
   APP_CALCULATOR,
-  APP_PADDLE_GAME
+  APP_PADDLE_GAME,
+  APP_ASI
 };
 
 AppState appState = APP_WELCOME;
@@ -208,6 +210,8 @@ void enterAppState(int next) {
     enterCalcState(CALC_TITLE);
   } else if (next == APP_PADDLE_GAME) {
     enterGameState(GAME_TITLE);
+  } else if (next == APP_ASI) {
+    enterASIState(ASI_DENIED);
   }
 }
 
@@ -255,6 +259,7 @@ void loop() {
     case APP_PRIMES:         handlePrimes(now);        break;
     case APP_CALCULATOR:     handleCalculator(now);    break;
     case APP_PADDLE_GAME:    handlePaddleGame(now);    break;
+    case APP_ASI:            handleASI(now);           break;
   }
 }
 
@@ -379,11 +384,9 @@ void handleProgramSelect(unsigned long now) {
     } else if (selectionPage == 3 && selectionGateOpen) {
       if (potValue >= 154 && potValue <= 583) {  // 15-57% → Paddle Game
         enterAppState(APP_PADDLE_GAME);
+      } else if (potValue >= 584) {  // 57-100% → ASI
+        enterAppState(APP_ASI);
       }
-      // ASI not yet implemented
-      // else if (potValue >= 584) {  // 57-100% → ASI
-      //   enterAppState(APP_ASI);
-      // }
     }
   }
 }
