@@ -17,7 +17,7 @@ enum PaddleGameState {
 static PaddleGameState gameState = GAME_TITLE;
 static int ballX = 1, ballY = 0;       // Ball position (X: 0-14, Y: 0-1)
 static int ballDX = 1, ballDY = 1;     // Ball velocity (-1 or +1)
-static int paddlePos = 1;              // 0=row0, 1=both, 2=row1
+static int paddlePos = 0;              // 0=row0, 2=row1 (no middle position)
 static int score = 0;                  // Number of successful paddle hits
 static int finalScore = 0;             // Saved score for display
 static unsigned long ballDelay = 250;  // ms between ball moves (decreases with score)
@@ -99,7 +99,7 @@ void enterGameState(PaddleGameState next) {
     ballY = 0;
     ballDX = 1;
     ballDY = 1;
-    paddlePos = 1;
+    paddlePos = 0;
     score = 0;
     ballDelay = 250;
     lastBallMove = millis();
@@ -156,7 +156,6 @@ static void moveBall() {
     // Check if paddle covers the ball's row
     bool paddleHit = false;
     if (paddlePos == 0 && newY == 0) paddleHit = true;
-    if (paddlePos == 1) paddleHit = true;  // covers both rows
     if (paddlePos == 2 && newY == 1) paddleHit = true;
 
     if (paddleHit) {
@@ -188,12 +187,11 @@ static void moveBall() {
 
 static void updatePaddleFromPot() {
   // Map pot to paddle position (no debounce - immediate response needed)
-  if (potValue < 342) {
-    paddlePos = 0;  // row 0 only
-  } else if (potValue < 683) {
-    paddlePos = 1;  // both rows (easiest)
+  // Only two positions: commit to upper or lower row
+  if (potValue < 512) {
+    paddlePos = 0;  // row 0 only (upper)
   } else {
-    paddlePos = 2;  // row 1 only
+    paddlePos = 2;  // row 1 only (lower)
   }
 }
 
@@ -220,11 +218,11 @@ static void drawGameScreen() {
     lcd.print(" ");
 
     // Draw new paddle
-    if (paddlePos == 0 || paddlePos == 1) {
+    if (paddlePos == 0) {
       lcd.setCursor(15, 0);
       lcd.write((uint8_t)5);
     }
-    if (paddlePos == 1 || paddlePos == 2) {
+    if (paddlePos == 2) {
       lcd.setCursor(15, 1);
       lcd.write((uint8_t)5);
     }
