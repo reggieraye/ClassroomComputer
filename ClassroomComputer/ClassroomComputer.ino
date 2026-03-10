@@ -321,14 +321,12 @@ void handleProgramSelect(unsigned long now) {
   // ── Display bottom line based on current page ──────────────────────────────
   lcd.setCursor(0, 1);
   if (selectionPage == 1) {
-    lcd.print("Sort | Primes ");
-    lcd.write((uint8_t)2);  // → right arrow
-    lcd.print(" ");         // pad to 16 chars
+    lcd.print("Sort | Primes  ");
+    lcd.write((uint8_t)2);  // → right arrow (right-justified)
   } else if (selectionPage == 2) {
     lcd.write((uint8_t)3);  // ← left arrow
-    lcd.print(" Calculator ");
-    lcd.write((uint8_t)2);  // → right arrow
-    lcd.print(" ");         // pad to 16 chars
+    lcd.print(" Calculator  ");
+    lcd.write((uint8_t)2);  // → right arrow (right-justified)
   } else {  // page 3
     lcd.write((uint8_t)3);  // ← left arrow
     lcd.print(" Game | ASI  ");
