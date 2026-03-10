@@ -66,11 +66,20 @@ bool welcomeJinglePlayed = false;
 // ── Scroll state ──────────────────────────────────────────────────────────────
 int scrollOffset = 0;   // leading-character index into the scroll string
 
-// ── Celebratory animation frames (pulsing diamond) ────────────────────────────
-// All three are written into custom-char slot 0 in turn each animation tick.
+// ── Celebratory animation frames ─────────────────────────────────────────────
+// Slot 0 is overwritten each animation tick.
+// Phase 1 – pulsing diamond (frames 0-2)
 byte celebFrame0[8] = { 0b00100, 0b01110, 0b11111, 0b11111, 0b01110, 0b00100, 0b00000, 0b00000 };
 byte celebFrame1[8] = { 0b00000, 0b00100, 0b01110, 0b11111, 0b01110, 0b00100, 0b00000, 0b00000 };
 byte celebFrame2[8] = { 0b00000, 0b00000, 0b00100, 0b01110, 0b00100, 0b00000, 0b00000, 0b00000 };
+// Phase 2 – spinning line (frames 3-6)
+byte celebFrame3[8] = { 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00000, 0b00000, 0b00000 };  // |
+byte celebFrame4[8] = { 0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b00000, 0b00000, 0b00000 };  // /
+byte celebFrame5[8] = { 0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000 };  // —
+byte celebFrame6[8] = { 0b10000, 0b01000, 0b00100, 0b00010, 0b00001, 0b00000, 0b00000, 0b00000 };  // backslash
+// Phase 3 – sparkle (frame 7)
+byte celebFrame7[8] = { 0b10001, 0b01010, 0b00100, 0b01010, 0b10001, 0b00000, 0b00000, 0b00000 };  // X sparkle
+const int     CELEB_FRAME_COUNT = 8;
 int           celebFrameIdx = 0;
 unsigned long celebTickAt   = 0;
 
@@ -121,6 +130,35 @@ void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 4
     } else {
       lcd.write((idx < len) ? (uint8_t)str[idx] : (uint8_t)' ');
     }
+  }
+}
+
+// ── Celebration sound helper ─────────────────────────────────────────────────
+// Non-blocking ascending jingle. Call each loop iteration during celebration.
+// Auto-resets when stateEnteredAt changes.
+void tickCelebrationSound(unsigned long now) {
+  static unsigned long soundStateStart = 0;
+  static int noteIdx = -1;
+
+  if (soundStateStart != stateEnteredAt) {
+    soundStateStart = stateEnteredAt;
+    noteIdx = -1;
+  }
+
+  unsigned long elapsed = now - stateEnteredAt;
+
+  if (noteIdx < 0 && elapsed >= 500UL) {
+    tone(BUZZER_PIN, 523, 100);   // C5
+    noteIdx = 0;
+  } else if (noteIdx == 0 && elapsed >= 650UL) {
+    tone(BUZZER_PIN, 659, 100);   // E5
+    noteIdx = 1;
+  } else if (noteIdx == 1 && elapsed >= 800UL) {
+    tone(BUZZER_PIN, 784, 100);   // G5
+    noteIdx = 2;
+  } else if (noteIdx == 2 && elapsed >= 950UL) {
+    tone(BUZZER_PIN, 1047, 200);  // C6 (longer final note)
+    noteIdx = 3;
   }
 }
 
