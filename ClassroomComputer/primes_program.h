@@ -6,10 +6,10 @@
 // ── Primes program states ─────────────────────────────────────────────────────
 enum PrimesState {
   PRIMES_TITLE,        // "Calculate Primes" for 1 s
-  PRIMES_INTRO_1,      // "Choose the # of / primes calc'd" for 1.5 s
+  PRIMES_INTRO_1,      // "Choose which / prime to find" for 1.5 s
   PRIMES_INTRO_2,      // "Move slider to / specify the #" for 1.5 s
   PRIMES_SHOW_N,       // "N = [n]" until slider static for 1.5 s
-  PRIMES_CALCULATING,  // "Calc'ing the 1st / [n] primes" until done
+  PRIMES_CALCULATING,  // "Finding the / [n]th prime" until done
   PRIMES_RESULT        // "The [n]th prime / is [result] X" for 4.5 s
 };
 
@@ -120,12 +120,12 @@ static void handlePrimesTitle(unsigned long now) {
   }
 }
 
-// State 2 – "Choose the # of / primes calc'd" for 1.5 s
+// State 2 – "Choose which / prime to find" for 1.5 s
 static void handlePrimesIntro1(unsigned long now) {
   lcd.setCursor(0, 0);
-  lcd.print("Choose the # of");
+  lcd.print("Choose which");
   lcd.setCursor(0, 1);
-  lcd.print("primes calc'd");
+  lcd.print("prime to find");
 
   if (now - stateEnteredAt >= 1500UL) {
     enterPrimesState(PRIMES_INTRO_2);
@@ -160,14 +160,15 @@ static void handlePrimesShowN(unsigned long now) {
   }
 }
 
-// State 5 – "Calc'ing the 1st / [n] primes" while computing.
+// State 5 – "Finding the / [n]th prime" while computing.
 // Blocks until the Nth prime is found, then transitions.
 static void handlePrimesCalculating(unsigned long now) {
   lcd.setCursor(0, 0);
-  lcd.print("Calc'ing the 1st");
+  lcd.print("Finding the");
   lcd.setCursor(0, 1);
   lcd.print(primesN);
-  lcd.print(" primes");
+  lcd.print(ordinalSuffix(primesN));
+  lcd.print(" prime     ");  // pad to clear leftover text
 
   // Find the primesN-th prime by trial division
   unsigned long count = 1;       // 2 is the 1st prime
