@@ -1,9 +1,28 @@
+/*************************************************************/
+ *
+ *     ________    ___   __________ ____  ____  ____  __  ___
+ *    / ____/ /   /   | / ___/ ___// __ \/ __ \/ __ \/  |/  /
+ *   / /   / /   / /| | \__ \\__ \/ /_/ / / / / / / / /|_/ / 
+ *  / /___/ /___/ ___ |___/ /__/ / _, _/ /_/ / /_/ / /  / /  
+ *  \____/_____/_/  |_/____/____/_/ |_|\____/\____/_/  /_/
+ *
+ *     __________  __  _______  __  __________________ 
+ *    / ____/ __ \/  |/  / __ \/ / / /_  __/ ____/ __ \
+ *   / /   / / / / /|_/ / /_/ / / / / / / / __/ / /_/ /
+ *  / /___/ /_/ / /  / / ____/ /_/ / / / / /___/ _, _/ 
+ *  \____/\____/_/  /_/_/    \____/ /_/ /_____/_/ |_|
+ *
+ *                  (C) 2026 by Reginald Raye
+ *
+ *************************************************************/
+
 #include <Wire.h>
 #include "rgb_lcd.h"
 #include "sort_program.h"
 #include "primes_program.h"
 #include "calculator_program.h"
 #include "paddle_game.h"
+#include "asi_program.h"
 
 // ══════════════════════════════════════════════════════════════════════════════
 // HARDWARE
@@ -37,7 +56,8 @@ enum AppState {
   APP_SORT_TEST,
   APP_PRIMES,
   APP_CALCULATOR,
-  APP_PADDLE_GAME
+  APP_PADDLE_GAME,
+  APP_ASI
 };
 
 AppState appState = APP_WELCOME;
@@ -190,6 +210,8 @@ void enterAppState(int next) {
     enterCalcState(CALC_TITLE);
   } else if (next == APP_PADDLE_GAME) {
     enterGameState(GAME_TITLE);
+  } else if (next == APP_ASI) {
+    enterASIState(ASI_DENIED);
   }
 }
 
@@ -237,6 +259,7 @@ void loop() {
     case APP_PRIMES:         handlePrimes(now);        break;
     case APP_CALCULATOR:     handleCalculator(now);    break;
     case APP_PADDLE_GAME:    handlePaddleGame(now);    break;
+    case APP_ASI:            handleASI(now);           break;
   }
 }
 
@@ -326,15 +349,15 @@ void handleProgramSelect(unsigned long now) {
   // ── Display bottom line based on current page ──────────────────────────────
   lcd.setCursor(0, 1);
   if (selectionPage == 1) {
-    lcd.print("Sort | Primes  ");
-    lcd.write((uint8_t)2);  // → right arrow (right-justified)
+    lcd.print("Sort | Primes  ");  // 15 chars
+    lcd.write((uint8_t)2);          // → at position 16
   } else if (selectionPage == 2) {
-    lcd.write((uint8_t)3);  // ← left arrow
-    lcd.print(" Calculator  ");
-    lcd.write((uint8_t)2);  // → right arrow (right-justified)
-  } else {  // page 3
-    lcd.write((uint8_t)3);  // ← left arrow
-    lcd.print(" Game | ASI  ");
+    lcd.write((uint8_t)3);          // ← at position 1
+    lcd.print(" Calculator   ");    // 14 chars (positions 2-15)
+    lcd.write((uint8_t)2);          // → at position 16
+  } else {  // page 3 (last page, no right arrow)
+    lcd.write((uint8_t)3);          // ← at position 1
+    lcd.print(" Game | ASI    ");   // 15 chars (positions 2-16)
   }
 
   // ── Open movement gate once pot moves far enough from page-change position ──
@@ -361,11 +384,9 @@ void handleProgramSelect(unsigned long now) {
     } else if (selectionPage == 3 && selectionGateOpen) {
       if (potValue >= 154 && potValue <= 583) {  // 15-57% → Paddle Game
         enterAppState(APP_PADDLE_GAME);
+      } else if (potValue >= 584) {  // 57-100% → ASI
+        enterAppState(APP_ASI);
       }
-      // ASI not yet implemented
-      // else if (potValue >= 584) {  // 57-100% → ASI
-      //   enterAppState(APP_ASI);
-      // }
     }
   }
 }
