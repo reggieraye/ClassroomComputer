@@ -63,6 +63,10 @@ unsigned long celebTickAt   = 0;
 // Custom character slot 1 = µ (mu) for microseconds display
 byte microChar[8] = { 0b00000, 0b01010, 0b01010, 0b01010, 0b01110, 0b01000, 0b01000, 0b00000 };
 
+// ── Rightwards arrow (→) custom character ─────────────────────────────────────
+// Custom character slot 2 = → (arrow) for program selection display
+byte arrowChar[8] = { 0b00000, 0b00100, 0b00010, 0b11111, 0b00010, 0b00100, 0b00000, 0b00000 };
+
 // ── Pot deadband – absorbs ADC noise ──────────────────────────────────────────
 const int POT_DEADBAND = 8;
 
@@ -133,6 +137,7 @@ void setup() {
   lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
   lcd.createChar(0, celebFrame0);  // slot 0 = animation frame (overwritten each tick)
   lcd.createChar(1, microChar);    // slot 1 = µ (micro) symbol
+  lcd.createChar(2, arrowChar);    // slot 2 = → (rightwards arrow)
 
   pinMode(BUZZER_PIN, OUTPUT);
 
@@ -203,7 +208,9 @@ void handleProgramSelect(unsigned long now) {
   }
 
   lcd.setCursor(0, 1);
-  lcd.print("Sort|Prime|Calc ");  // 16 chars padded to clear any leftover chars
+  lcd.print("Sort | Primes ");
+  lcd.write((uint8_t)2);  // custom arrow character
+  lcd.print(" ");         // pad to 16 chars
 
   if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
     if (potValue <= 341) {
