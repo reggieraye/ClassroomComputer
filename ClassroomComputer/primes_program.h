@@ -68,8 +68,16 @@ extern unsigned long potLastMovedAt;
 extern byte celebFrame0[8];
 extern byte celebFrame1[8];
 extern byte celebFrame2[8];
+extern byte celebFrame3[8];
+extern byte celebFrame4[8];
+extern byte celebFrame5[8];
+extern byte celebFrame6[8];
+extern byte celebFrame7[8];
+extern const int CELEB_FRAME_COUNT;
 extern int celebFrameIdx;
 extern unsigned long celebTickAt;
+extern const int BUZZER_PIN;
+extern void tickCelebrationSound(unsigned long now);
 extern const unsigned long SCROLL_START_DELAY;
 extern void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap, bool loop);
 extern void enterAppState(int nextState);  // forward declaration; APP_PROGRAM_SELECT = 1
@@ -209,8 +217,9 @@ static void handlePrimesResult(unsigned long now) {
   }
 
   if (now >= celebTickAt) {
-    celebFrameIdx = (celebFrameIdx + 1) % 3;
-    byte* frames[3] = {celebFrame0, celebFrame1, celebFrame2};
+    celebFrameIdx = (celebFrameIdx + 1) % CELEB_FRAME_COUNT;
+    byte* frames[8] = {celebFrame0, celebFrame1, celebFrame2, celebFrame3,
+                        celebFrame4, celebFrame5, celebFrame6, celebFrame7};
     lcd.createChar(0, frames[celebFrameIdx]);
     celebTickAt = now + 200UL;
   }
@@ -218,6 +227,9 @@ static void handlePrimesResult(unsigned long now) {
   // createChar moves the cursor, so reposition before writing the char
   lcd.setCursor(celebCol, 1);
   lcd.write((uint8_t)0);
+
+  // Celebration jingle
+  tickCelebrationSound(now);
 
   // ── Timeout ────────────────────────────────────────────────────────────────
   if (now - stateEnteredAt >= 6000UL) {

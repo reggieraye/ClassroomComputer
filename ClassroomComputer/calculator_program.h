@@ -63,8 +63,16 @@ extern unsigned long potLastMovedAt;
 extern byte celebFrame0[8];
 extern byte celebFrame1[8];
 extern byte celebFrame2[8];
+extern byte celebFrame3[8];
+extern byte celebFrame4[8];
+extern byte celebFrame5[8];
+extern byte celebFrame6[8];
+extern byte celebFrame7[8];
+extern const int CELEB_FRAME_COUNT;
 extern int celebFrameIdx;
 extern unsigned long celebTickAt;
+extern const int BUZZER_PIN;
+extern void tickCelebrationSound(unsigned long now);
 extern void enterAppState(int nextState);  // forward declaration; APP_PROGRAM_SELECT = 1
 
 void enterCalcState(CalcState next) {
@@ -246,7 +254,7 @@ static void handleCalcResult(unsigned long now) {
   lcd.print(resultStr);
   lcd.print(" ");
 
-  // Celebration animation (pulsing diamond)
+  // Celebration animation (pulse → spin → sparkle)
   if (celebTickAt < stateEnteredAt) {
     celebFrameIdx = 0;
     lcd.createChar(0, celebFrame0);
@@ -254,13 +262,17 @@ static void handleCalcResult(unsigned long now) {
   }
 
   if (now >= celebTickAt) {
-    celebFrameIdx = (celebFrameIdx + 1) % 3;
-    byte* frames[3] = {celebFrame0, celebFrame1, celebFrame2};
+    celebFrameIdx = (celebFrameIdx + 1) % CELEB_FRAME_COUNT;
+    byte* frames[8] = {celebFrame0, celebFrame1, celebFrame2, celebFrame3,
+                        celebFrame4, celebFrame5, celebFrame6, celebFrame7};
     lcd.createChar(0, frames[celebFrameIdx]);
     celebTickAt = now + 200UL;
   }
 
   lcd.write((uint8_t)0);  // draw celebration character
+
+  // Celebration jingle
+  tickCelebrationSound(now);
 
   // Return to program select after 5 seconds
   if (now - stateEnteredAt >= 5000UL) {
