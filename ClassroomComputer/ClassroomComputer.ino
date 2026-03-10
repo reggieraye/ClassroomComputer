@@ -55,6 +55,11 @@ int  remappedPotValue = 10;    // pot value mapped to [10, 350]
 int selectionPage = 1;
 unsigned long pageChangedAt = 0;  // millis() of last page transition
 
+// ── Movement gate: blocks selection on pages 2+ until intentional pot movement ─
+int  potValueAtPageChange = 0;     // pot snapshot when page changed
+bool selectionGateOpen    = true;  // true = selection allowed
+const int GATE_MOVEMENT_THRESHOLD = 50;  // pot units required to open gate
+
 // ── Welcome jingle state ──────────────────────────────────────────────────────
 bool welcomeJinglePlayed = false;
 
@@ -136,6 +141,7 @@ void enterAppState(int next) {
   } else if (next == APP_PROGRAM_SELECT) {
     selectionPage = 1;  // Always start at page 1 when entering selection screen
     pageChangedAt = 0;  // Reset cooldown timer
+    selectionGateOpen = true;  // Page 1 has no gate
   } else if (next == APP_PRIMES) {
     enterPrimesState(PRIMES_TITLE);
   } else if (next == APP_SORT_TEST) {
@@ -245,24 +251,31 @@ void handleProgramSelect(unsigned long now) {
     if (selectionPage == 1) {
       if (potValue >= 819) {  // 80% → transition to page 2
         selectionPage = 2;
-        potHasMoved = false;  // Prevent immediate program entry
+        potHasMoved = false;
         pageChangedAt = now;
+        potValueAtPageChange = potValue;  // snapshot for movement gate
+        selectionGateOpen = false;        // require intentional movement
       }
     } else if (selectionPage == 2) {
       if (potValue <= 153) {  // 15% → back to page 1
         selectionPage = 1;
         potHasMoved = false;
         pageChangedAt = now;
+        selectionGateOpen = true;         // page 1 has no gate
       } else if (potValue >= 870) {  // 85% → forward to page 3
         selectionPage = 3;
         potHasMoved = false;
         pageChangedAt = now;
+        potValueAtPageChange = potValue;
+        selectionGateOpen = false;
       }
     } else if (selectionPage == 3) {
       if (potValue <= 153) {  // 15% → back to page 2
         selectionPage = 2;
         potHasMoved = false;
         pageChangedAt = now;
+        potValueAtPageChange = potValue;
+        selectionGateOpen = false;
       }
     }
   }
@@ -283,6 +296,13 @@ void handleProgramSelect(unsigned long now) {
     lcd.print(" Game | ASI  ");
   }
 
+  // ── Open movement gate once pot moves far enough from page-change position ──
+  if (!selectionGateOpen && abs(potValue - potValueAtPageChange) > GATE_MOVEMENT_THRESHOLD) {
+    selectionGateOpen = true;
+    potHasMoved = true;          // count the gate-opening move as valid movement
+    potLastMovedAt = now;        // restart the hold timer from this point
+  }
+
   // ── Handle program selection after 625ms hold ──────────────────────────────
   if (potHasMoved && (now - potLastMovedAt >= 625UL)) {
     if (selectionPage == 1) {
@@ -292,12 +312,12 @@ void handleProgramSelect(unsigned long now) {
         enterAppState(APP_PRIMES);
       }
       // 80-100% is transition zone, no program entry
-    } else if (selectionPage == 2) {
+    } else if (selectionPage == 2 && selectionGateOpen) {
       if (potValue >= 154 && potValue <= 869) {  // 15-85% → Calculator
         enterAppState(APP_CALCULATOR);
       }
       // 0-15% and 85-100% are transition zones
-    } else if (selectionPage == 3) {
+    } else if (selectionPage == 3 && selectionGateOpen) {
       // Game and ASI not yet implemented
       // if (potValue >= 154 && potValue <= 583) {  // 15-57% → Game
       //   enterAppState(APP_GAME);
