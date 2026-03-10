@@ -5,9 +5,9 @@
 
 // ── Calculator program states ─────────────────────────────────────────────────
 enum CalcState {
-  CALC_TITLE,            // "Calculator Program" for 1 s
-  CALC_INTRO,            // "Select two #s to / +, -, *, or /" for 2 s
-  CALC_SELECT_A_INTRO,   // "Move slider to / select 1st #" for 1.2 s
+  CALC_TITLE,            // "Calculator Program" for 1.2 s
+  CALC_INTRO,            // "Select two #s to / +, -, *, or /" for 3.3 s
+  CALC_SELECT_A_INTRO,   // "Move slider to / select 1st #" for 2 s
   CALC_SELECT_A,         // "A = [value]" until slider static for 1.3 s
   CALC_SELECT_B_INTRO,   // "Move slider to / select 2nd #" for 1.2 s
   CALC_SELECT_B,         // "B = [value]" until slider static for 1.3 s
@@ -101,7 +101,7 @@ static void handleCalcTitle(unsigned long now) {
   lcd.setCursor(0, 1);
   lcd.print("Program");
 
-  if (now - stateEnteredAt >= 1000UL) {
+  if (now - stateEnteredAt >= 1200UL) {
     enterCalcState(CALC_INTRO);
   }
 }
@@ -113,19 +113,19 @@ static void handleCalcIntro(unsigned long now) {
   lcd.setCursor(0, 1);
   lcd.print("+, -, *, or /");
 
-  if (now - stateEnteredAt >= 2000UL) {
+  if (now - stateEnteredAt >= 3300UL) {
     enterCalcState(CALC_SELECT_A_INTRO);
   }
 }
 
-// State 3 – "Move slider to / select 1st #" for 1.2 s.
+// State 3 – "Move slider to / select 1st #" for 2 s.
 static void handleCalcSelectAIntro(unsigned long now) {
   lcd.setCursor(0, 0);
   lcd.print("Move slider to");
   lcd.setCursor(0, 1);
   lcd.print("select 1st #");
 
-  if (now - stateEnteredAt >= 1200UL) {
+  if (now - stateEnteredAt >= 2000UL) {
     enterCalcState(CALC_SELECT_A);
   }
 }

@@ -10,7 +10,7 @@
 
 rgb_lcd lcd;
 const int POT_PIN    = A0;
-const int BUZZER_PIN = 2;
+const int BUZZER_PIN = 8;
 
 // ── Backlight colours ─────────────────────────────────────────────────────────
 const byte COL_PINK[3]  = {255,   0, 128};
@@ -27,7 +27,7 @@ int scrollSpeed = 3;
 const unsigned long SCROLL_START_DELAY = 750UL;
 
 // ── Cooldown between page transitions (prevents jump-through) ─────────────────
-const unsigned long PAGE_TRANSITION_COOLDOWN = 300UL;
+const unsigned long PAGE_TRANSITION_COOLDOWN = 900UL;
 
 // ── Top-level application states ──────────────────────────────────────────────
 enum AppState {
@@ -54,6 +54,9 @@ int  remappedPotValue = 10;    // pot value mapped to [10, 350]
 // ── Program selection page (1, 2, or 3) ───────────────────────────────────────
 int selectionPage = 1;
 unsigned long pageChangedAt = 0;  // millis() of last page transition
+
+// ── Welcome jingle state ──────────────────────────────────────────────────────
+bool welcomeJinglePlayed = false;
 
 // ── Scroll state ──────────────────────────────────────────────────────────────
 int scrollOffset = 0;   // leading-character index into the scroll string
@@ -128,7 +131,9 @@ void enterAppState(int next) {
   lcd.clear();
 
   // Reset program-specific states to their initial values
-  if (next == APP_PROGRAM_SELECT) {
+  if (next == APP_WELCOME) {
+    welcomeJinglePlayed = false;  // Reset jingle for welcome screen
+  } else if (next == APP_PROGRAM_SELECT) {
     selectionPage = 1;  // Always start at page 1 when entering selection screen
     pageChangedAt = 0;  // Reset cooldown timer
   } else if (next == APP_PRIMES) {
@@ -194,6 +199,18 @@ void loop() {
 // Layout: 0.75 s static, then 6 s scrolling (wrap gap 4). Total = 6.75 s.
 void handleWelcome(unsigned long now) {
   const char* msg = "Welcome to the Classroom Computer!";
+
+  // Play welcome jingle 1 second after entering welcome state
+  if (!welcomeJinglePlayed && (now - stateEnteredAt >= 1000UL)) {
+    tone(BUZZER_PIN, 262, 100);  // C4
+    delay(120);
+    tone(BUZZER_PIN, 330, 100);  // E4
+    delay(120);
+    tone(BUZZER_PIN, 392, 100);  // G4
+    delay(120);
+    tone(BUZZER_PIN, 523, 150);  // C5
+    welcomeJinglePlayed = true;
+  }
 
   if (now - stateEnteredAt < SCROLL_START_DELAY) {
     // Static display – show the first 16 characters before scrolling begins
@@ -266,8 +283,8 @@ void handleProgramSelect(unsigned long now) {
     lcd.print(" Game | ASI  ");
   }
 
-  // ── Handle program selection after 500ms hold ──────────────────────────────
-  if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
+  // ── Handle program selection after 625ms hold ──────────────────────────────
+  if (potHasMoved && (now - potLastMovedAt >= 625UL)) {
     if (selectionPage == 1) {
       if (potValue <= 409) {        // 0-40% → Sort
         enterAppState(APP_SORT_TEST);
