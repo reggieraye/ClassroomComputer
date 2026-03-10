@@ -48,6 +48,9 @@ int  potValuePrev     = -1;    // -1 = no previous reading (sentinel)
 bool potHasMoved      = false; // has pot moved since entering current state?
 int  remappedPotValue = 10;    // pot value mapped to [10, 350]
 
+// ── Program selection page (1, 2, or 3) ───────────────────────────────────────
+int selectionPage = 1;
+
 // ── Scroll state ──────────────────────────────────────────────────────────────
 int scrollOffset = 0;   // leading-character index into the scroll string
 
@@ -66,6 +69,10 @@ byte microChar[8] = { 0b00000, 0b01010, 0b01010, 0b01010, 0b01110, 0b01000, 0b01
 // ── Rightwards arrow (→) custom character ─────────────────────────────────────
 // Custom character slot 2 = → (arrow) for program selection display
 byte arrowChar[8] = { 0b00000, 0b00100, 0b00010, 0b11111, 0b00010, 0b00100, 0b00000, 0b00000 };
+
+// ── Leftwards arrow (←) custom character ──────────────────────────────────────
+// Custom character slot 3 = ← (left arrow) for program selection display
+byte leftArrowChar[8] = { 0b00000, 0b00100, 0b01000, 0b11111, 0b01000, 0b00100, 0b00000, 0b00000 };
 
 // ── Pot deadband – absorbs ADC noise ──────────────────────────────────────────
 const int POT_DEADBAND = 8;
@@ -117,7 +124,9 @@ void enterAppState(int next) {
   lcd.clear();
 
   // Reset program-specific states to their initial values
-  if (next == APP_PRIMES) {
+  if (next == APP_PROGRAM_SELECT) {
+    selectionPage = 1;  // Always start at page 1 when entering selection screen
+  } else if (next == APP_PRIMES) {
     enterPrimesState(PRIMES_TITLE);
   } else if (next == APP_SORT_TEST) {
     enterSortState(SORT_TITLE);
@@ -138,6 +147,7 @@ void setup() {
   lcd.createChar(0, celebFrame0);  // slot 0 = animation frame (overwritten each tick)
   lcd.createChar(1, microChar);    // slot 1 = µ (micro) symbol
   lcd.createChar(2, arrowChar);    // slot 2 = → (rightwards arrow)
+  lcd.createChar(3, leftArrowChar);// slot 3 = ← (leftwards arrow)
 
   pinMode(BUZZER_PIN, OUTPUT);
 
@@ -207,18 +217,64 @@ void handleProgramSelect(unsigned long now) {
     tickScroll(msg, 0, now, 4, true);
   }
 
-  lcd.setCursor(0, 1);
-  lcd.print("Sort | Primes ");
-  lcd.write((uint8_t)2);  // custom arrow character
-  lcd.print(" ");         // pad to 16 chars
+  // ── Handle page transitions based on pot position ──────────────────────────
+  if (selectionPage == 1) {
+    if (potValue >= 819) {  // 80% → transition to page 2
+      selectionPage = 2;
+      potHasMoved = false;  // Prevent immediate program entry
+    }
+  } else if (selectionPage == 2) {
+    if (potValue <= 153) {  // 15% → back to page 1
+      selectionPage = 1;
+      potHasMoved = false;
+    } else if (potValue >= 870) {  // 85% → forward to page 3
+      selectionPage = 3;
+      potHasMoved = false;
+    }
+  } else if (selectionPage == 3) {
+    if (potValue <= 153) {  // 15% → back to page 2
+      selectionPage = 2;
+      potHasMoved = false;
+    }
+  }
 
+  // ── Display bottom line based on current page ──────────────────────────────
+  lcd.setCursor(0, 1);
+  if (selectionPage == 1) {
+    lcd.print("Sort | Primes ");
+    lcd.write((uint8_t)2);  // → right arrow
+    lcd.print(" ");         // pad to 16 chars
+  } else if (selectionPage == 2) {
+    lcd.write((uint8_t)3);  // ← left arrow
+    lcd.print(" Calculator ");
+    lcd.write((uint8_t)2);  // → right arrow
+    lcd.print(" ");         // pad to 16 chars
+  } else {  // page 3
+    lcd.write((uint8_t)3);  // ← left arrow
+    lcd.print(" Game | ASI  ");
+  }
+
+  // ── Handle program selection after 500ms hold ──────────────────────────────
   if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
-    if (potValue <= 341) {
-      enterAppState(APP_SORT_TEST);
-    } else if (potValue <= 682) {
-      enterAppState(APP_PRIMES);
-    } else {
-      enterAppState(APP_CALCULATOR);
+    if (selectionPage == 1) {
+      if (potValue <= 409) {        // 0-40% → Sort
+        enterAppState(APP_SORT_TEST);
+      } else if (potValue <= 818) {  // 40-80% → Primes
+        enterAppState(APP_PRIMES);
+      }
+      // 80-100% is transition zone, no program entry
+    } else if (selectionPage == 2) {
+      if (potValue >= 154 && potValue <= 869) {  // 15-85% → Calculator
+        enterAppState(APP_CALCULATOR);
+      }
+      // 0-15% and 85-100% are transition zones
+    } else if (selectionPage == 3) {
+      // Game and ASI not yet implemented
+      // if (potValue >= 154 && potValue <= 583) {  // 15-57% → Game
+      //   enterAppState(APP_GAME);
+      // } else if (potValue >= 584) {  // 57-100% → ASI
+      //   enterAppState(APP_ASI);
+      // }
     }
   }
 }
