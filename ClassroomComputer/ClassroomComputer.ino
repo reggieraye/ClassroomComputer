@@ -344,15 +344,15 @@ void handleProgramSelect(unsigned long now) {
   // ── Display bottom line based on current page ──────────────────────────────
   lcd.setCursor(0, 1);
   if (selectionPage == 1) {
-    lcd.print("Sort | Primes  ");
-    lcd.write((uint8_t)2);  // → right arrow (right-justified)
+    lcd.print("Sort | Primes  ");  // 15 chars
+    lcd.write((uint8_t)2);          // → at position 16
   } else if (selectionPage == 2) {
-    lcd.write((uint8_t)3);  // ← left arrow
-    lcd.print(" Calculator  ");
-    lcd.write((uint8_t)2);  // → right arrow (right-justified)
-  } else {  // page 3
-    lcd.write((uint8_t)3);  // ← left arrow
-    lcd.print(" Game | ASI  ");
+    lcd.write((uint8_t)3);          // ← at position 1
+    lcd.print(" Calculator   ");    // 14 chars (positions 2-15)
+    lcd.write((uint8_t)2);          // → at position 16
+  } else {  // page 3 (last page, no right arrow)
+    lcd.write((uint8_t)3);          // ← at position 1
+    lcd.print(" Game | ASI    ");   // 15 chars (positions 2-16)
   }
 
   // ── Open movement gate once pot moves far enough from page-change position ──
