@@ -27,7 +27,7 @@ int scrollSpeed = 3;
 const unsigned long SCROLL_START_DELAY = 750UL;
 
 // ── Cooldown between page transitions (prevents jump-through) ─────────────────
-const unsigned long PAGE_TRANSITION_COOLDOWN = 300UL;
+const unsigned long PAGE_TRANSITION_COOLDOWN = 900UL;
 
 // ── Top-level application states ──────────────────────────────────────────────
 enum AppState {
@@ -283,8 +283,8 @@ void handleProgramSelect(unsigned long now) {
     lcd.print(" Game | ASI  ");
   }
 
-  // ── Handle program selection after 500ms hold ──────────────────────────────
-  if (potHasMoved && (now - potLastMovedAt >= 500UL)) {
+  // ── Handle program selection after 625ms hold ──────────────────────────────
+  if (potHasMoved && (now - potLastMovedAt >= 625UL)) {
     if (selectionPage == 1) {
       if (potValue <= 409) {        // 0-40% → Sort
         enterAppState(APP_SORT_TEST);
