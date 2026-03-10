@@ -26,6 +26,9 @@ int scrollSpeed = 3;
 // ── Delay before scrolling begins after entering a state ──────────────────────
 const unsigned long SCROLL_START_DELAY = 750UL;
 
+// ── Cooldown between page transitions (prevents jump-through) ─────────────────
+const unsigned long PAGE_TRANSITION_COOLDOWN = 300UL;
+
 // ── Top-level application states ──────────────────────────────────────────────
 enum AppState {
   APP_WELCOME,
@@ -50,6 +53,7 @@ int  remappedPotValue = 10;    // pot value mapped to [10, 350]
 
 // ── Program selection page (1, 2, or 3) ───────────────────────────────────────
 int selectionPage = 1;
+unsigned long pageChangedAt = 0;  // millis() of last page transition
 
 // ── Scroll state ──────────────────────────────────────────────────────────────
 int scrollOffset = 0;   // leading-character index into the scroll string
@@ -126,6 +130,7 @@ void enterAppState(int next) {
   // Reset program-specific states to their initial values
   if (next == APP_PROGRAM_SELECT) {
     selectionPage = 1;  // Always start at page 1 when entering selection screen
+    pageChangedAt = 0;  // Reset cooldown timer
   } else if (next == APP_PRIMES) {
     enterPrimesState(PRIMES_TITLE);
   } else if (next == APP_SORT_TEST) {
@@ -218,23 +223,30 @@ void handleProgramSelect(unsigned long now) {
   }
 
   // ── Handle page transitions based on pot position ──────────────────────────
-  if (selectionPage == 1) {
-    if (potValue >= 819) {  // 80% → transition to page 2
-      selectionPage = 2;
-      potHasMoved = false;  // Prevent immediate program entry
-    }
-  } else if (selectionPage == 2) {
-    if (potValue <= 153) {  // 15% → back to page 1
-      selectionPage = 1;
-      potHasMoved = false;
-    } else if (potValue >= 870) {  // 85% → forward to page 3
-      selectionPage = 3;
-      potHasMoved = false;
-    }
-  } else if (selectionPage == 3) {
-    if (potValue <= 153) {  // 15% → back to page 2
-      selectionPage = 2;
-      potHasMoved = false;
+  // Only allow transitions after cooldown period to prevent jump-through
+  if (now - pageChangedAt >= PAGE_TRANSITION_COOLDOWN) {
+    if (selectionPage == 1) {
+      if (potValue >= 819) {  // 80% → transition to page 2
+        selectionPage = 2;
+        potHasMoved = false;  // Prevent immediate program entry
+        pageChangedAt = now;
+      }
+    } else if (selectionPage == 2) {
+      if (potValue <= 153) {  // 15% → back to page 1
+        selectionPage = 1;
+        potHasMoved = false;
+        pageChangedAt = now;
+      } else if (potValue >= 870) {  // 85% → forward to page 3
+        selectionPage = 3;
+        potHasMoved = false;
+        pageChangedAt = now;
+      }
+    } else if (selectionPage == 3) {
+      if (potValue <= 153) {  // 15% → back to page 2
+        selectionPage = 2;
+        potHasMoved = false;
+        pageChangedAt = now;
+      }
     }
   }
 
