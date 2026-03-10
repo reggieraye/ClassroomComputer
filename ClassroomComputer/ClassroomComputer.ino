@@ -3,6 +3,7 @@
 #include "sort_program.h"
 #include "primes_program.h"
 #include "calculator_program.h"
+#include "paddle_game.h"
 
 // ══════════════════════════════════════════════════════════════════════════════
 // HARDWARE
@@ -35,7 +36,8 @@ enum AppState {
   APP_PROGRAM_SELECT,
   APP_SORT_TEST,
   APP_PRIMES,
-  APP_CALCULATOR
+  APP_CALCULATOR,
+  APP_PADDLE_GAME
 };
 
 AppState appState = APP_WELCOME;
@@ -186,6 +188,8 @@ void enterAppState(int next) {
     enterSortState(SORT_TITLE);
   } else if (next == APP_CALCULATOR) {
     enterCalcState(CALC_TITLE);
+  } else if (next == APP_PADDLE_GAME) {
+    enterGameState(GAME_TITLE);
   }
 }
 
@@ -232,6 +236,7 @@ void loop() {
     case APP_SORT_TEST:      handleSortTest(now);      break;
     case APP_PRIMES:         handlePrimes(now);        break;
     case APP_CALCULATOR:     handleCalculator(now);    break;
+    case APP_PADDLE_GAME:    handlePaddleGame(now);    break;
   }
 }
 
@@ -321,14 +326,12 @@ void handleProgramSelect(unsigned long now) {
   // ── Display bottom line based on current page ──────────────────────────────
   lcd.setCursor(0, 1);
   if (selectionPage == 1) {
-    lcd.print("Sort | Primes ");
-    lcd.write((uint8_t)2);  // → right arrow
-    lcd.print(" ");         // pad to 16 chars
+    lcd.print("Sort | Primes  ");
+    lcd.write((uint8_t)2);  // → right arrow (right-justified)
   } else if (selectionPage == 2) {
     lcd.write((uint8_t)3);  // ← left arrow
-    lcd.print(" Calculator ");
-    lcd.write((uint8_t)2);  // → right arrow
-    lcd.print(" ");         // pad to 16 chars
+    lcd.print(" Calculator  ");
+    lcd.write((uint8_t)2);  // → right arrow (right-justified)
   } else {  // page 3
     lcd.write((uint8_t)3);  // ← left arrow
     lcd.print(" Game | ASI  ");
@@ -356,10 +359,11 @@ void handleProgramSelect(unsigned long now) {
       }
       // 0-15% and 85-100% are transition zones
     } else if (selectionPage == 3 && selectionGateOpen) {
-      // Game and ASI not yet implemented
-      // if (potValue >= 154 && potValue <= 583) {  // 15-57% → Game
-      //   enterAppState(APP_GAME);
-      // } else if (potValue >= 584) {  // 57-100% → ASI
+      if (potValue >= 154 && potValue <= 583) {  // 15-57% → Paddle Game
+        enterAppState(APP_PADDLE_GAME);
+      }
+      // ASI not yet implemented
+      // else if (potValue >= 584) {  // 57-100% → ASI
       //   enterAppState(APP_ASI);
       // }
     }
