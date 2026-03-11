@@ -210,10 +210,59 @@ static void handleCalcSelectOp(unsigned long now) {
   }
 }
 
-// State 9 – "A [op] B = / [result] X" for 5 s, then back to program select.
-// Computes result, handles overflow with "..." truncation, and shows celebration animation.
+// ── Result formatting helpers ─────────────────────────────────────────────────
+
+// Inserts commas into a string of digits with an optional leading '-'.
+// E.g. "1000000" -> "1,000,000", "-1000" -> "-1,000", "999" -> "999"
+static void addCommasToIntStr(const char* digits, char* out) {
+  int outIdx = 0;
+  int start = 0;
+  int len = strlen(digits);
+  if (len > 0 && digits[0] == '-') { out[outIdx++] = '-'; start = 1; len--; }
+  int first = (len % 3 == 0) ? 3 : len % 3;
+  for (int i = 0; i < first; i++) out[outIdx++] = digits[start + i];
+  for (int i = first; i < len; i++) {
+    if ((i - first) % 3 == 0) out[outIdx++] = ',';
+    out[outIdx++] = digits[start + i];
+  }
+  out[outIdx] = '\0';
+}
+
+// Formats a float result into out[] (must be ≥ 17 bytes):
+//   Integer: no decimal point, commas every 3 digits  e.g. "1,000,000"
+//   Non-integer: integer part with commas + '.' + as many decimal digits as
+//                fit within 14 total characters (float precision capped at 6)
+static void formatCalcResult(float result, char* out) {
+  const int MAX_CHARS = 14;
+  long longVal = (long)result;
+  bool isInt = (result == (float)longVal);
+
+  char digits[14];
+  ltoa(longVal, digits, 10);
+
+  if (isInt) {
+    addCommasToIntStr(digits, out);
+  } else {
+    // Build integer part with commas, then append decimal portion
+    char intBuf[14];
+    addCommasToIntStr(digits, intBuf);
+    int intLen = strlen(intBuf);
+
+    int decPlaces = MAX_CHARS - intLen - 1;  // chars left after intPart + '.'
+    if (decPlaces < 1) decPlaces = 1;
+    if (decPlaces > 6) decPlaces = 6;        // float has ~7 significant digits
+
+    char fullBuf[24];
+    dtostrf(result, 0, decPlaces, fullBuf);
+    char* dot = strchr(fullBuf, '.');
+    strcpy(out, intBuf);
+    if (dot) strcat(out, dot);
+  }
+}
+
+// State 9 – "A [op] B = / [result]" for 5 s, then back to program select.
 static void handleCalcResult(unsigned long now) {
-  // Compute result on first entry
+  // Compute result on first entry (or within first 10 ms of re-entry)
   static bool computed = false;
   if (!computed || (now - stateEnteredAt) < 10) {
     computed = true;
@@ -235,41 +284,41 @@ static void handleCalcResult(unsigned long now) {
   lcd.print(" =");
   lcd.print("        ");  // clear any leftover
 
-  // Display result on bottom line with celebration animation
-  lcd.setCursor(0, 1);
-
-  // Convert result to string
+  // Format result string
   char resultStr[20];
-  dtostrf(calcResult, 0, 2, resultStr);  // format with 2 decimal places
-
-  // Truncate if > 13 chars (leaving room for " " + celebration char + padding)
+  formatCalcResult(calcResult, resultStr);
   int len = strlen(resultStr);
-  if (len > 13) {
-    resultStr[13] = '.';
-    resultStr[14] = '.';
-    resultStr[15] = '.';
-    resultStr[16] = '\0';
+
+  // Display result on bottom line.
+  // Layout: result (≤14 chars) + " " + celebChar  — OR —
+  //         first 14 chars + ".." when result exceeds 14 chars.
+  lcd.setCursor(0, 1);
+  if (len > 14) {
+    // Truncate to 14 chars and fill cols 14-15 with ".."
+    char buf[15];
+    strncpy(buf, resultStr, 14);
+    buf[14] = '\0';
+    lcd.print(buf);
+    lcd.print("..");
+  } else {
+    lcd.print(resultStr);
+    lcd.print(" ");
+
+    // Celebration animation (pulse → spin → sparkle) in remaining space
+    if (celebTickAt < stateEnteredAt) {
+      celebFrameIdx = 0;
+      lcd.createChar(0, celebFrame0);
+      celebTickAt = stateEnteredAt + 200UL;
+    }
+    if (now >= celebTickAt) {
+      celebFrameIdx = (celebFrameIdx + 1) % CELEB_FRAME_COUNT;
+      byte* frames[8] = {celebFrame0, celebFrame1, celebFrame2, celebFrame3,
+                          celebFrame4, celebFrame5, celebFrame6, celebFrame7};
+      lcd.createChar(0, frames[celebFrameIdx]);
+      celebTickAt = now + 200UL;
+    }
+    lcd.write((uint8_t)0);  // celebration character right after result
   }
-
-  lcd.print(resultStr);
-  lcd.print(" ");
-
-  // Celebration animation (pulse → spin → sparkle)
-  if (celebTickAt < stateEnteredAt) {
-    celebFrameIdx = 0;
-    lcd.createChar(0, celebFrame0);
-    celebTickAt = stateEnteredAt + 200UL;
-  }
-
-  if (now >= celebTickAt) {
-    celebFrameIdx = (celebFrameIdx + 1) % CELEB_FRAME_COUNT;
-    byte* frames[8] = {celebFrame0, celebFrame1, celebFrame2, celebFrame3,
-                        celebFrame4, celebFrame5, celebFrame6, celebFrame7};
-    lcd.createChar(0, frames[celebFrameIdx]);
-    celebTickAt = now + 200UL;
-  }
-
-  lcd.write((uint8_t)0);  // draw celebration character
 
   // Celebration jingle
   tickCelebrationSound(now);
