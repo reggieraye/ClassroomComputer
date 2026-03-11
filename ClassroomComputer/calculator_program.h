@@ -250,13 +250,21 @@ static void formatCalcResult(float result, char* out) {
 
     int decPlaces = MAX_CHARS - intLen - 1;  // chars left after intPart + '.'
     if (decPlaces < 1) decPlaces = 1;
-    if (decPlaces > 6) decPlaces = 6;        // float has ~7 significant digits
+    // No upper cap: fill the full 14-char budget for maximum precision
 
     char fullBuf[24];
     dtostrf(result, 0, decPlaces, fullBuf);
     char* dot = strchr(fullBuf, '.');
     strcpy(out, intBuf);
     if (dot) strcat(out, dot);
+
+    // Strip trailing zeros from decimal part (e.g. "499.5000000000" -> "499.5")
+    char* outDot = strchr(out, '.');
+    if (outDot) {
+      int i = strlen(out) - 1;
+      while (i > (outDot - out) && out[i] == '0') i--;
+      out[i + 1] = '\0';
+    }
   }
 }
 
