@@ -4,7 +4,7 @@ The Classroom Computer is very nearly the simplest computer that a person can bu
 
 In any event, I would encourage you to make a version of it yourself for two primary reasons. First, it gives one a palpable sense of what a computer is and does. Second, it provides a great platform, or proving ground, for you to code your own programs. If they can work effectively in this context, they will surely work in more featureful environments. 
 
-![Classroom Computer][(https://uc5df8b3b54bc1d7273e9425a4cd.previews.dropboxusercontent.com/p/thumb/AC8SyaFIEgAePWFLLuwEgHm_0AQT2P_FjcyzJuh_DlHKhGnGiyFk46KQP_qjZ0N4cTIN_lorPlz1fzkbFt_1EBnZWybzuRTsxDbI3p9Nh1AxWpLGEv0rXAQJN6jfbj-L1BCZGO7m5h77KPTDFT60sFd3v43G-RYDQe6VJ0KQzcJQn2sl-aDsAbnrPpQxopl5RQL_ARVUcpXmLTWmUjmCH4ltBBQAgx-q-unNPv4KJB0HwuLTVRHqFDWai-Wu5lCCzEMqfxJBX4Cg3cRU-uASxFJ8P8wNwyIUrfEHgmQ7rlituA2jNS3iJ5CjP9ZLtJQVxqKyDimv4yvOv62g6FI8VACVI9eUO0QgOO0P2K9x20bMGtOO1KLnZfjqP1aZxJVmLKunYntaTw706Y5Z0252xGKD/p.jpeg?is_prewarmed=true))]
+![Classroom Computer](https://uc5df8b3b54bc1d7273e9425a4cd.previews.dropboxusercontent.com/p/thumb/AC8SyaFIEgAePWFLLuwEgHm_0AQT2P_FjcyzJuh_DlHKhGnGiyFk46KQP_qjZ0N4cTIN_lorPlz1fzkbFt_1EBnZWybzuRTsxDbI3p9Nh1AxWpLGEv0rXAQJN6jfbj-L1BCZGO7m5h77KPTDFT60sFd3v43G-RYDQe6VJ0KQzcJQn2sl-aDsAbnrPpQxopl5RQL_ARVUcpXmLTWmUjmCH4ltBBQAgx-q-unNPv4KJB0HwuLTVRHqFDWai-Wu5lCCzEMqfxJBX4Cg3cRU-uASxFJ8P8wNwyIUrfEHgmQ7rlituA2jNS3iJ5CjP9ZLtJQVxqKyDimv4yvOv62g6FI8VACVI9eUO0QgOO0P2K9x20bMGtOO1KLnZfjqP1aZxJVmLKunYntaTw706Y5Z0252xGKD/p.jpeg?is_prewarmed=true)
 
 ## What It Does
 
