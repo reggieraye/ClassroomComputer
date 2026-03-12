@@ -1,12 +1,14 @@
 # Classroom Computer
 
-An Arduino-based educational computer that demonstrates algorithms and provides interactive utilities. Features a 16x2 LCD display, potentiometer control, and audio feedback.
+The Classroom Computer is very nearly the simplest computer that a person can build. For information processing, it's got a basic Arduino. For output, it's got a basic two-line LCD display. And for input, there's a simple knob. But due to the unreasonable power of digital logic, you can do a lot with a setup this limited. As I told the students for whom this computer was built, it still has over an order of magnitude more processing power than the Apollo 11 computer that landed men on the moon. 
 
-![Classroom Computer](link-to-photo-placeholder)
+In any event, I would encourage you to make a version of it yourself for two primary reasons. First, it gives one a palpable sense of what a computer is and does. Second, it provides a great platform, or proving ground, for you to code your own programs. If they can work effectively in this context, they will surely work in more featureful environments. 
+
+![Classroom Computer][(https://uc5df8b3b54bc1d7273e9425a4cd.previews.dropboxusercontent.com/p/thumb/AC8SyaFIEgAePWFLLuwEgHm_0AQT2P_FjcyzJuh_DlHKhGnGiyFk46KQP_qjZ0N4cTIN_lorPlz1fzkbFt_1EBnZWybzuRTsxDbI3p9Nh1AxWpLGEv0rXAQJN6jfbj-L1BCZGO7m5h77KPTDFT60sFd3v43G-RYDQe6VJ0KQzcJQn2sl-aDsAbnrPpQxopl5RQL_ARVUcpXmLTWmUjmCH4ltBBQAgx-q-unNPv4KJB0HwuLTVRHqFDWai-Wu5lCCzEMqfxJBX4Cg3cRU-uASxFJ8P8wNwyIUrfEHgmQ7rlituA2jNS3iJ5CjP9ZLtJQVxqKyDimv4yvOv62g6FI8VACVI9eUO0QgOO0P2K9x20bMGtOO1KLnZfjqP1aZxJVmLKunYntaTw706Y5Z0252xGKD/p.jpeg?is_prewarmed=true))]
 
 ## What It Does
 
-The Classroom Computer runs three interactive programs:
+The Classroom Computer runs some number of interactive programs. Among the programs created so far are:
 
 1. **Sort Test** - Visualizes bubble sort algorithm with timing display
 2. **Prime Finder** - Finds prime numbers in the range 1-1000
@@ -22,12 +24,12 @@ Navigate between programs using the potentiometer slider, then use the same slid
 - Linear potentiometer (10kΩ recommended)
 - Small speaker (2-lead piezo or magnetic)
 - Jumper wires
-- Breadboard (optional, for prototyping)
 
 ### Enclosure
-- Laser-cut acrylic or wood panels ([CAD files](link-placeholder))
-- M3 screws and standoffs
-- USB cable (Type-C for R4 Minima)
+- 1/8 in (3 mm) laser-cut acrylic or wood panels 
+- 4x M3 screws and nuts
+- USB cable (type-C for R4 Minima)
+- USB Li-Ion Power Bank with 5V Outputs @ 2.1A - 5000mAh
 
 ## Build Instructions
 
