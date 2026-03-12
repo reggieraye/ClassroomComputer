@@ -138,7 +138,7 @@ static void handleCalcSelectAIntro(unsigned long now) {
   }
 }
 
-// State 4 – "A = [remappedPotValue]" until slider static for 1.3 s.
+// State 4 – "A = [remappedPotValue]" until slider static for 2.5 s.
 // Map pot 0-1023 to 1-1000 locally for calculator.
 static void handleCalcSelectA(unsigned long now) {
   int displayValue = map(potValue, 0, 1023, 1, 1000);
@@ -148,7 +148,7 @@ static void handleCalcSelectA(unsigned long now) {
   lcd.print(displayValue);
   lcd.print("     ");  // overwrite any leftover digits
 
-  if (potHasMoved && (now - potLastMovedAt >= 1300UL)) {
+  if (potHasMoved && (now - potLastMovedAt >= 2500UL)) {
     calcA = displayValue;
     enterCalcState(CALC_SELECT_B_INTRO);
   }
@@ -166,7 +166,7 @@ static void handleCalcSelectBIntro(unsigned long now) {
   }
 }
 
-// State 6 – "B = [remappedPotValue]" until slider static for 1.3 s.
+// State 6 – "B = [remappedPotValue]" until slider static for 2.5 s.
 // Map pot 0-1023 to 1-1000 locally for calculator.
 static void handleCalcSelectB(unsigned long now) {
   int displayValue = map(potValue, 0, 1023, 1, 1000);
@@ -176,7 +176,7 @@ static void handleCalcSelectB(unsigned long now) {
   lcd.print(displayValue);
   lcd.print("     ");  // overwrite any leftover digits
 
-  if (potHasMoved && (now - potLastMovedAt >= 1300UL)) {
+  if (potHasMoved && (now - potLastMovedAt >= 2500UL)) {
     calcB = displayValue;
     enterCalcState(CALC_SELECT_OP_INTRO);
   }

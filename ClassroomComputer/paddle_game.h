@@ -17,7 +17,7 @@ enum PaddleGameState {
 // Delays in ms: level 1 = 350ms, each subsequent level = prev / 1.20
 static const unsigned long LEVEL_DELAYS[10] = {350, 292, 243, 203, 169, 141, 117, 98, 82, 68};
 static const int NUM_LEVELS = 10;
-static const int HITS_PER_LEVEL = 5;   // paddle hits needed to advance one level
+static const int HITS_PER_LEVEL = 3;   // paddle hits needed to advance one level
 
 // ── Game-specific state ───────────────────────────────────────────────────────
 static PaddleGameState gameState = GAME_TITLE;
@@ -100,7 +100,7 @@ void enterGameState(PaddleGameState next) {
   potHasMoved = false;
 
   if (next == GAME_PLAYING) {
-    lcd.setRGB(COL_GREEN[0], COL_GREEN[1], COL_GREEN[2]);
+    lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
     // Seed RNG from timing jitter so each game plays differently
     randomSeed(micros());
     // Reset game state
@@ -326,12 +326,15 @@ static void handleGameOver(unsigned long now) {
 }
 
 static void handleGameResult(unsigned long now) {
-  // Static text with celebration animation
   if (celebTickAt < stateEnteredAt) {
     celebFrameIdx = 0;
     lcd.createChar(0, celebFrame0);
     lcd.setCursor(0, 0);
-    lcd.print("Great job! ");
+    if (finalScore < 5) {
+      lcd.print("Oh well :/      ");
+    } else {
+      lcd.print("Great job! ");
+    }
     lcd.setCursor(0, 1);
     lcd.print("Hits: ");
     lcd.print(finalScore);
@@ -339,18 +342,19 @@ static void handleGameResult(unsigned long now) {
     celebTickAt = stateEnteredAt + 200UL;
   }
 
-  // Advance animation frame
-  if (now >= celebTickAt) {
-    celebFrameIdx = (celebFrameIdx + 1) % CELEB_FRAME_COUNT;
-    byte* frames[8] = {celebFrame0, celebFrame1, celebFrame2, celebFrame3,
-                        celebFrame4, celebFrame5, celebFrame6, celebFrame7};
-    lcd.createChar(0, frames[celebFrameIdx]);
-    celebTickAt = now + 200UL;
+  if (finalScore >= 5) {
+    // Advance animation frame
+    if (now >= celebTickAt) {
+      celebFrameIdx = (celebFrameIdx + 1) % CELEB_FRAME_COUNT;
+      byte* frames[8] = {celebFrame0, celebFrame1, celebFrame2, celebFrame3,
+                          celebFrame4, celebFrame5, celebFrame6, celebFrame7};
+      lcd.createChar(0, frames[celebFrameIdx]);
+      celebTickAt = now + 200UL;
+    }
+    // Draw celebration character after "job! "
+    lcd.setCursor(11, 0);
+    lcd.write((uint8_t)0);
   }
-
-  // Draw celebration character after "job! "
-  lcd.setCursor(11, 0);
-  lcd.write((uint8_t)0);
 
   // Celebration sound
   tickCelebrationSound(now);
