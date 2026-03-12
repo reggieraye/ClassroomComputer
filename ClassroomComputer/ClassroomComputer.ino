@@ -211,7 +211,7 @@ void enterAppState(int next) {
   } else if (next == APP_PADDLE_GAME) {
     enterGameState(GAME_TITLE);
   } else if (next == APP_ASI) {
-    enterASIState(ASI_DENIED);
+    enterASIState(ASI_WELCOME_1);
   }
 }
 
