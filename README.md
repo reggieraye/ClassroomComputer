@@ -29,7 +29,8 @@ Navigate between programs using the potentiometer slider, then use the same slid
 - 1/8 in (3 mm) laser-cut acrylic or wood panels 
 - 4x M3 screws and nuts
 - USB cable (type-C for R4 Minima)
-- USB Li-Ion Power Bank with 5V Outputs @ 2.1A - 5000mAh
+- USB Li-Ion power nank with 5V Outputs @ 2.1A - 5000mAh (from Adafruit)
+- Select finger joints were bonded with weld-on acrylic
 
 ## Build Instructions
 
@@ -75,60 +76,23 @@ Navigate between programs using the potentiometer slider, then use the same slid
 3. Mount LCD in front panel cutout
 4. Mount potentiometer in side panel
 5. Secure speaker inside enclosure
-6. Assemble panels and secure with screws
+6. Assemble panels and secure with screws and weld-on (sparingly)
 
 ## How to Use
 
 ### Starting Up
-Power on the Arduino via USB or external power supply. The welcome screen appears for 3 seconds, then the program selection menu loads.
+Power on the Arduino via USB or external power supply. The welcome screen appears for ~3 seconds, then the program selection menu loads.
 
 ### Selecting a Program
-Move the potentiometer slider:
-- **Left third**: Sort Test
-- **Middle third**: Prime Finder
-- **Right third**: Calculator
-
-Hold the slider in position for 0.5 seconds to lock in your selection.
-
-### Program Controls
-
-**Sort Test:**
-1. Select array size (1-50) with slider
-2. Watch the sort visualization
-3. See timing results
-4. Returns to menu automatically
-
-**Prime Finder:**
-1. Select a number (1-1000) with slider
-2. Computer determines if it's prime
-3. If composite, shows smallest factor
-4. Returns to menu automatically
-
-**Calculator:**
-1. Select first number A (1-1000) with slider
-2. Select second number B (1-1000) with slider
-3. Select operation with slider (quartiles: +, -, ×, ÷)
-4. See the result with celebration animation
-5. Returns to menu automatically
-
-## Customization
-
-Want to add your own programs? See [CLAUDE.md](CLAUDE.md) for development guidelines and architecture details.
+Move the potentiometer slider to select program. Note that if write your own programs, you will have to manually specify which percent of the slider range maps to which program.
 
 ## Files
 
 - **Firmware**: `ClassroomComputer/` directory
-- **CAD Files**: [link-placeholder] (Fusion 360, STEP format)
-- **Laser Cut Files**: [link-placeholder] (SVG, DXF format)
+- **CAD**: [Onshape project](https://cad.onshape.com/documents/2c616913ed35852bc2abee61/w/cb143e35db52d72bd43e4b08/e/0127d00eb2454f0f71ede743?renderMode=0&uiState=69b31ef32c020ddc21038ab5)
+- **Laser Cut Files**: [The Adobe Illustrator files in this folder](https://www.dropbox.com/scl/fo/buwry2dpekuhzvbac7raz/AEnpvI6yAWcVBEK0AMFHpDo?rlkey=oy1yj3bhf98fbxmac3mu35kar&st=710h4esm&dl=0)
 
 ## License
 
-This project is open source. [License details TBD]
+This project is licensed under the MIT License. Put simnply, you may use it and adapt it as you wish, but you must credit this project. 
 
-## Credits
-
-Built with Arduino and the Grove RGB LCD library.
-
-## Questions?
-
-[Contact info or issue tracker placeholder]
