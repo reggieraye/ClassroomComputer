@@ -170,10 +170,12 @@ static void moveBall() {
 
   // Check right edge (paddle at column 15)
   if (newX >= 15) {
-    // Check if paddle covers the ball's row
+    // Check against ballY (the row the player last saw) rather than newY.
+    // The ball moves diagonally, so newY may differ from ballY; using newY would
+    // cause the paddle to miss even when visually aligned with the ball's approach.
     bool paddleHit = false;
-    if (paddlePos == 0 && newY == 0) paddleHit = true;
-    if (paddlePos == 2 && newY == 1) paddleHit = true;
+    if (paddlePos == 0 && ballY == 0) paddleHit = true;
+    if (paddlePos == 2 && ballY == 1) paddleHit = true;
 
     if (paddleHit) {
       ballDX = -1;
