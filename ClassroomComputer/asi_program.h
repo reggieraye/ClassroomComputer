@@ -31,6 +31,7 @@ extern unsigned long stateEnteredAt;
 extern int scrollOffset;
 extern unsigned long scrollTickAt;
 extern const int BUZZER_PIN;
+extern int scrollSpeed;
 extern void enterAppState(int nextState);
 extern void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap, bool loop);
 
@@ -107,8 +108,10 @@ void handleASI(unsigned long now) {
 
     case ASI_WELCOME_2:
       lcd.setCursor(0, 0); lcd.print("Welcome,        ");
+      scrollSpeed += 2;
       tickScroll("Reginald Raye CitizenID 2718281828", 1, now, 4, false);
-      if (elapsed >= 1100UL) enterASIState(ASI_MORALITY_1);
+      scrollSpeed -= 2;
+      if (elapsed >= 1300UL) enterASIState(ASI_MORALITY_1);
       break;
 
     case ASI_MORALITY_1:
@@ -130,7 +133,7 @@ void handleASI(unsigned long now) {
       break;
 
     case ASI_CULL:
-      lcd.setCursor(0, 0); lcd.print("To survive the  ");
+      lcd.setCursor(0, 0); lcd.print("to survive the  ");
       lcd.setCursor(0, 1); lcd.print("next cull, 3/19 ");
       if (elapsed >= 1800UL) enterASIState(ASI_THANKS);
       break;
@@ -145,7 +148,7 @@ void handleASI(unsigned long now) {
     case ASI_BLACKOUT:
       // Backlight already set to (0,0,0) and display cleared in enterASIState.
       tickASIBlackoutDits(now);
-      if (elapsed >= 1100UL) enterAppState(1);  // APP_PROGRAM_SELECT
+      if (elapsed >= 1400UL) enterAppState(1);  // APP_PROGRAM_SELECT
       break;
   }
 }
