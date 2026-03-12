@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-// ── Primes program states ─────────────────────────────────────────────────────
+//       Primes program states
 enum PrimesState {
   PRIMES_TITLE,        // "Calculate Primes" for 1 s
   PRIMES_INTRO_1,      // "Choose which / prime to find" for 1.5 s
@@ -13,16 +13,16 @@ enum PrimesState {
   PRIMES_RESULT        // "The [n]th prime / is [result] X" for 4.5 s
 };
 
-// ── Primes-specific state ─────────────────────────────────────────────────────
+//       Primes-specific state
 static PrimesState   primesState  = PRIMES_TITLE;
 static int           primesN      = 500;   // locked-in N (how many primes to find)
 static unsigned long primesResult = 0;     // the Nth prime, set by PRIMES_CALCULATING
 
-// ── Forward declarations (need to be visible to other modules) ────────────────
+//       Forward declarations (need to be visible to other modules)
 void enterPrimesState(PrimesState next);
 void handlePrimes(unsigned long now);
 
-// ── Prime helper ──────────────────────────────────────────────────────────────
+//       Prime helper
 static bool isPrime(unsigned long n) {
   if (n < 2) return false;
   if (n == 2) return true;
@@ -33,7 +33,7 @@ static bool isPrime(unsigned long n) {
   return true;
 }
 
-// ── Ordinal suffix helper ─────────────────────────────────────────────────────
+//       Ordinal suffix helper
 static const char* ordinalSuffix(int n) {
   int mod100 = abs(n) % 100;
   if (mod100 >= 11 && mod100 <= 13) return "th";
@@ -45,7 +45,7 @@ static const char* ordinalSuffix(int n) {
   }
 }
 
-// ── Primes sub-handler forward declarations ───────────────────────────────────
+//       Primes sub-handler forward declarations
 static void handlePrimesTitle(unsigned long now);
 static void handlePrimesIntro1(unsigned long now);
 static void handlePrimesIntro2(unsigned long now);
@@ -53,7 +53,7 @@ static void handlePrimesShowN(unsigned long now);
 static void handlePrimesCalculating(unsigned long now);
 static void handlePrimesResult(unsigned long now);
 
-// ── Implementations ───────────────────────────────────────────────────────────
+//       Implementations
 
 // External references to shared state (defined in main sketch)
 extern rgb_lcd lcd;
@@ -107,7 +107,7 @@ void handlePrimes(unsigned long now) {
   }
 }
 
-// ── Primes sub-handlers ───────────────────────────────────────────────────────
+//       Primes sub-handlers
 
 // State 1 – "Calculate Primes" for 1 s, then advance.
 // "Calculate Primes" is exactly 16 chars so no scrolling needed.
@@ -185,7 +185,7 @@ static void handlePrimesCalculating(unsigned long now) {
 // State 6 – "The [n]th prime / is [result] X" for 6.0 s.
 // Top line scrolls if >16 chars; bottom is always static with celeb animation.
 static void handlePrimesResult(unsigned long now) {
-  // ── Top line ───────────────────────────────────────────────────────────────
+  //       Top line
   char topLine[32];
   snprintf(topLine, sizeof(topLine), "The %d%s prime", primesN, ordinalSuffix(primesN));
   int topLen = strlen(topLine);
@@ -202,7 +202,7 @@ static void handlePrimesResult(unsigned long now) {
     }
   }
 
-  // ── Bottom line (always fits in 16) ────────────────────────────────────────
+  //       Bottom line (always fits in 16)
   char botText[16];
   snprintf(botText, sizeof(botText), "is %lu ", primesResult);
   int celebCol = strlen(botText);
@@ -210,7 +210,7 @@ static void handlePrimesResult(unsigned long now) {
   lcd.setCursor(0, 1);
   lcd.print(botText);
 
-  // ── Celebratory animation (pulsing diamond) ───────────────────────────────
+  //       Celebratory animation (pulsing diamond)
   if (celebTickAt < stateEnteredAt) {
     celebFrameIdx = 0;
     lcd.createChar(0, celebFrame0);
@@ -232,7 +232,7 @@ static void handlePrimesResult(unsigned long now) {
   // Celebration jingle
   tickCelebrationSound(now);
 
-  // ── Timeout ────────────────────────────────────────────────────────────────
+  //       Timeout
   if (now - stateEnteredAt >= 6000UL) {
     enterAppState(1);  // APP_PROGRAM_SELECT = 1
   }

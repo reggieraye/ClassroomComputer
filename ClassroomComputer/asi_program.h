@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-// ── ASI Program states ────────────────────────────────────────────────────────
+//       ASI Program states
 enum ASIState {
   ASI_WELCOME_1,   // "Welcome," / "Reginald Raye" – 2 s, welcome jingle 0.4 s in
   ASI_WELCOME_2,   // "Welcome," / scroll CitizenID – 0.5 s, scroll immediately
@@ -15,16 +15,16 @@ enum ASIState {
   ASI_BLACKOUT     // black backlight, blank display – 0.5 s, then program select
 };
 
-// ── ASI-specific state ────────────────────────────────────────────────────────
+//       ASI-specific state
 static ASIState asiState = ASI_WELCOME_1;
 
-// ── Forward declarations ──────────────────────────────────────────────────────
+//       Forward declarations
 void enterASIState(ASIState next);
 void handleASI(unsigned long now);
 static void tickASIWelcomeJingle(unsigned long now);
 static void tickASIDoneJingle(unsigned long now);
 
-// ── External references (defined in main sketch) ──────────────────────────────
+//       External references (defined in main sketch)
 extern rgb_lcd lcd;
 extern const byte COL_PINK[3];
 extern unsigned long stateEnteredAt;
@@ -35,7 +35,7 @@ extern int scrollSpeed;
 extern void enterAppState(int nextState);
 extern void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap, bool loop);
 
-// ── Implementations ───────────────────────────────────────────────────────────
+//       Implementations
 
 void enterASIState(ASIState next) {
   asiState       = next;
