@@ -43,24 +43,29 @@ void enterASIState(ASIState next) {
   scrollOffset   = 0;
   scrollTickAt   = millis();
 
-  if (next == ASI_BLACKOUT) {
-    lcd.setRGB(0, 0, 0);
-  } else {
-    lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
-  }
+  lcd.setRGB(COL_PINK[0], COL_PINK[1], COL_PINK[2]);
   lcd.clear();
+
+  if (next == ASI_BLACKOUT) {
+    // Fill display with solid-block characters (0xFF) against the pink backlight.
+    lcd.setCursor(0, 0);
+    for (int i = 0; i < 16; i++) lcd.write((uint8_t)0xFF);
+    lcd.setCursor(0, 1);
+    for (int i = 0; i < 16; i++) lcd.write((uint8_t)0xFF);
+  }
 }
 
-// Non-blocking welcome jingle: C5 → E5 → G5, fires starting at 0.4 s.
+// Non-blocking welcome jingle: C5 → E5 → G5 → C6, fires starting at 0.4 s.
 static void tickASIWelcomeJingle(unsigned long now) {
   static unsigned long lastStateStart = 0;
   static int noteIdx = -1;
   if (lastStateStart != stateEnteredAt) { lastStateStart = stateEnteredAt; noteIdx = -1; }
 
   unsigned long e = now - stateEnteredAt;
-  if      (noteIdx < 0  && e >= 400UL) { tone(BUZZER_PIN, 523, 100); noteIdx = 0; }  // C5
-  else if (noteIdx == 0 && e >= 550UL) { tone(BUZZER_PIN, 659, 100); noteIdx = 1; }  // E5
-  else if (noteIdx == 1 && e >= 700UL) { tone(BUZZER_PIN, 784, 150); noteIdx = 2; }  // G5
+  if      (noteIdx < 0  && e >= 400UL) { tone(BUZZER_PIN,  523, 100); noteIdx = 0; }  // C5
+  else if (noteIdx == 0 && e >= 550UL) { tone(BUZZER_PIN,  659, 100); noteIdx = 1; }  // E5
+  else if (noteIdx == 1 && e >= 700UL) { tone(BUZZER_PIN,  784, 100); noteIdx = 2; }  // G5
+  else if (noteIdx == 2 && e >= 900UL) { tone(BUZZER_PIN, 1047, 200); noteIdx = 3; }  // C6
 }
 
 // Non-blocking 3D-printer-done jingle: ascending fanfare, fires starting at 0.4 s.
@@ -108,10 +113,10 @@ void handleASI(unsigned long now) {
 
     case ASI_WELCOME_2:
       lcd.setCursor(0, 0); lcd.print("Welcome,        ");
-      scrollSpeed += 2;
+      scrollSpeed += 3;
       tickScroll("Reginald Raye CitizenID 2718281828", 1, now, 4, false);
-      scrollSpeed -= 2;
-      if (elapsed >= 1300UL) enterASIState(ASI_MORALITY_1);
+      scrollSpeed -= 3;
+      if (elapsed >= 1400UL) enterASIState(ASI_MORALITY_1);
       break;
 
     case ASI_MORALITY_1:
