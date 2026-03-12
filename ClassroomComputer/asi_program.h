@@ -78,6 +78,21 @@ static void tickASIDoneJingle(unsigned long now) {
   else if (noteIdx == 4 && e >= 1250UL) { tone(BUZZER_PIN, 1568, 400); noteIdx = 5; }  // G6
 }
 
+// Non-blocking blackout dits: 5 staccato high-pitched blips starting immediately.
+// 2800 Hz, 35 ms each, spaced 70 ms apart – all done by ~350 ms.
+static void tickASIBlackoutDits(unsigned long now) {
+  static unsigned long lastStateStart = 0;
+  static int noteIdx = -1;
+  if (lastStateStart != stateEnteredAt) { lastStateStart = stateEnteredAt; noteIdx = -1; }
+
+  unsigned long e = now - stateEnteredAt;
+  if      (noteIdx < 0  && e >=   0UL) { tone(BUZZER_PIN, 2800, 35); noteIdx = 0; }
+  else if (noteIdx == 0 && e >=  70UL) { tone(BUZZER_PIN, 2800, 35); noteIdx = 1; }
+  else if (noteIdx == 1 && e >= 140UL) { tone(BUZZER_PIN, 2800, 35); noteIdx = 2; }
+  else if (noteIdx == 2 && e >= 210UL) { tone(BUZZER_PIN, 2800, 35); noteIdx = 3; }
+  else if (noteIdx == 3 && e >= 280UL) { tone(BUZZER_PIN, 2800, 35); noteIdx = 4; }
+}
+
 void handleASI(unsigned long now) {
   unsigned long elapsed = now - stateEnteredAt;
 
@@ -93,31 +108,31 @@ void handleASI(unsigned long now) {
     case ASI_WELCOME_2:
       lcd.setCursor(0, 0); lcd.print("Welcome,        ");
       tickScroll("Reginald Raye CitizenID 2718281828", 1, now, 4, false);
-      if (elapsed >= 500UL) enterASIState(ASI_MORALITY_1);
+      if (elapsed >= 1100UL) enterASIState(ASI_MORALITY_1);
       break;
 
     case ASI_MORALITY_1:
       lcd.setCursor(0, 0); lcd.print("Your Morality   ");
       lcd.setCursor(0, 1); lcd.print("Quotient YTD is ");
-      if (elapsed >= 1700UL) enterASIState(ASI_MORALITY_2);
+      if (elapsed >= 2000UL) enterASIState(ASI_MORALITY_2);
       break;
 
     case ASI_MORALITY_2:
       lcd.setCursor(0, 0); lcd.print("72.4th          ");
       lcd.setCursor(0, 1); lcd.print("percentile      ");
-      if (elapsed >= 1500UL) enterASIState(ASI_IMPROVE);
+      if (elapsed >= 1800UL) enterASIState(ASI_IMPROVE);
       break;
 
     case ASI_IMPROVE:
       lcd.setCursor(0, 0); lcd.print("Please improve  ");
       lcd.setCursor(0, 1); lcd.print("MQ by 15.2%     ");
-      if (elapsed >= 1500UL) enterASIState(ASI_CULL);
+      if (elapsed >= 1800UL) enterASIState(ASI_CULL);
       break;
 
     case ASI_CULL:
       lcd.setCursor(0, 0); lcd.print("To survive the  ");
       lcd.setCursor(0, 1); lcd.print("next cull, 3/19 ");
-      if (elapsed >= 1500UL) enterASIState(ASI_THANKS);
+      if (elapsed >= 1800UL) enterASIState(ASI_THANKS);
       break;
 
     case ASI_THANKS:
@@ -129,7 +144,8 @@ void handleASI(unsigned long now) {
 
     case ASI_BLACKOUT:
       // Backlight already set to (0,0,0) and display cleared in enterASIState.
-      if (elapsed >= 500UL) enterAppState(1);  // APP_PROGRAM_SELECT
+      tickASIBlackoutDits(now);
+      if (elapsed >= 1100UL) enterAppState(1);  // APP_PROGRAM_SELECT
       break;
   }
 }
