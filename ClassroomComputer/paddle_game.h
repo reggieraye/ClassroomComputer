@@ -13,6 +13,12 @@ enum PaddleGameState {
   GAME_RESULT         // Celebration screen for 4.5 s
 };
 
+// ── Level speed table (10 levels, each ~20% faster than previous) ─────────────
+// Delays in ms: level 1 = 350ms, each subsequent level = prev / 1.20
+static const unsigned long LEVEL_DELAYS[10] = {350, 292, 243, 203, 169, 141, 117, 98, 82, 68};
+static const int NUM_LEVELS = 10;
+static const int HITS_PER_LEVEL = 5;   // paddle hits needed to advance one level
+
 // ── Game-specific state ───────────────────────────────────────────────────────
 static PaddleGameState gameState = GAME_TITLE;
 static int ballX = 1, ballY = 0;       // Ball position (X: 0-14, Y: 0-1)
@@ -20,7 +26,8 @@ static int ballDX = 1, ballDY = 1;     // Ball velocity (-1 or +1)
 static int paddlePos = 0;              // 0=row0, 2=row1 (no middle position)
 static int score = 0;                  // Number of successful paddle hits
 static int finalScore = 0;             // Saved score for display
-static unsigned long ballDelay = 250;  // ms between ball moves (decreases with score)
+static int level = 1;                  // Current difficulty level (1-10)
+static unsigned long ballDelay = 350;  // ms between ball moves (set from LEVEL_DELAYS)
 static unsigned long lastBallMove = 0; // timestamp of last ball movement
 
 // ── Forward declarations ──────────────────────────────────────────────────────
@@ -94,14 +101,17 @@ void enterGameState(PaddleGameState next) {
 
   if (next == GAME_PLAYING) {
     lcd.setRGB(COL_GREEN[0], COL_GREEN[1], COL_GREEN[2]);
+    // Seed RNG from timing jitter so each game plays differently
+    randomSeed(micros());
     // Reset game state
     ballX = 1;
-    ballY = 0;
+    ballY = random(0, 2);           // random starting row
     ballDX = 1;
-    ballDY = 1;
+    ballDY = (random(0, 2) == 0) ? 1 : -1;  // random starting vertical direction
     paddlePos = 0;
     score = 0;
-    ballDelay = 250;
+    level = 1;
+    ballDelay = LEVEL_DELAYS[0];
     lastBallMove = millis();
     // Define custom characters for ball and paddle
     lcd.createChar(4, ballChar);
@@ -144,10 +154,17 @@ static void moveBall() {
     tone(BUZZER_PIN, 300, 50);
   }
 
-  // Bounce off left wall
+  // Bounce off left wall — randomize vertical direction to break predictable pattern
   if (newX < 0) {
     ballDX = 1;
     newX = 0;
+    // 50% chance to keep current Y direction, 50% chance to flip it
+    if (random(0, 2) == 0) {
+      ballDY = -ballDY;
+    }
+    // Clamp: if random flip would send ball out of bounds, correct it
+    if (newY <= 0) ballDY = 1;
+    if (newY >= 1) ballDY = -1;
     tone(BUZZER_PIN, 300, 50);
   }
 
@@ -164,9 +181,17 @@ static void moveBall() {
       score++;
       tone(BUZZER_PIN, 600, 80);
 
-      // Speed up every 5 hits (minimum 100ms delay)
-      if (score % 5 == 0 && ballDelay > 100) {
-        ballDelay -= 30;
+      // 40% chance to randomize Y direction on paddle hit for extra unpredictability
+      if (random(0, 5) < 2) {
+        ballDY = -ballDY;
+      }
+
+      // Advance level every HITS_PER_LEVEL hits (up to NUM_LEVELS)
+      int newLevel = (score / HITS_PER_LEVEL) + 1;
+      if (newLevel > NUM_LEVELS) newLevel = NUM_LEVELS;
+      if (newLevel != level) {
+        level = newLevel;
+        ballDelay = LEVEL_DELAYS[level - 1];
       }
     } else {
       // Miss! Play game-over sound and transition
