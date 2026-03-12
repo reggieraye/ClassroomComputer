@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-//       Paddle Game states
+//  Paddle Game states
 enum PaddleGameState {
   GAME_TITLE,         // "Paddle Ball" for 1.5 s
   GAME_INSTRUCTIONS,  // Instructions for 2.5 s
@@ -13,13 +13,13 @@ enum PaddleGameState {
   GAME_RESULT         // Celebration screen for 4.5 s
 };
 
-//       Level speed table (10 levels, each ~20% faster than previous)
+//  Level speed table (10 levels, each ~20% faster than previous)
 // Delays in ms: level 1 = 350ms, each subsequent level = prev / 1.20
 static const unsigned long LEVEL_DELAYS[10] = {350, 292, 243, 203, 169, 141, 117, 98, 82, 68};
 static const int NUM_LEVELS = 10;
 static const int HITS_PER_LEVEL = 3;   // paddle hits needed to advance one level
 
-//       Game-specific state
+//  Game-specific state
 static PaddleGameState gameState = GAME_TITLE;
 static int ballX = 1, ballY = 0;       // Ball position (X: 0-14, Y: 0-1)
 static int ballDX = 1, ballDY = 1;     // Ball velocity (-1 or +1)
@@ -30,16 +30,16 @@ static int level = 1;                  // Current difficulty level (1-10)
 static unsigned long ballDelay = 350;  // ms between ball moves (set from LEVEL_DELAYS)
 static unsigned long lastBallMove = 0; // timestamp of last ball movement
 
-//       Forward declarations
+//  Forward declarations
 void enterGameState(PaddleGameState next);
 void handlePaddleGame(unsigned long now);
 
-//       Game helpers
+//  Game helpers
 static void moveBall();
 static void updatePaddleFromPot();
 static void drawGameScreen();
 
-//       State handler forward declarations
+//  State handler forward declarations
 static void handleGameTitle(unsigned long now);
 static void handleGameInstructions(unsigned long now);
 static void handleGameReady(unsigned long now);
@@ -47,7 +47,7 @@ static void handleGamePlaying(unsigned long now);
 static void handleGameOver(unsigned long now);
 static void handleGameResult(unsigned long now);
 
-//       Implementations
+//  Implementations
 
 // External references (defined in main sketch)
 extern rgb_lcd lcd;
@@ -136,7 +136,7 @@ void handlePaddleGame(unsigned long now) {
   }
 }
 
-//       Game helper implementations
+//  Game helper implementations
 
 static void moveBall() {
   // Calculate new position
@@ -261,7 +261,7 @@ static void drawGameScreen() {
   prevBallY = ballY;
 }
 
-//       State handlers
+//  State handlers
 
 static void handleGameTitle(unsigned long now) {
   lcd.setCursor(0, 0);

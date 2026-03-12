@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-//       Calculator program states
+//  Calculator program states
 enum CalcState {
   CALC_TITLE,            // "Calculator Program" for 1.2 s
   CALC_INTRO,            // "Select two #s to / +, -, *, or /" for 3.3 s
@@ -16,19 +16,19 @@ enum CalcState {
   CALC_RESULT            // "A [op] B = / [result] X" for 5 s, then back to program select
 };
 
-//       Calculator-specific state
+//  Calculator-specific state
 static CalcState calcState = CALC_TITLE;
 static int       calcA     = 1;      // First number (1-1000)
 static int       calcB     = 1;      // Second number (1-1000)
 static char      calcOp    = '+';    // Operation: '+', '-', '*', '/'
 static float     calcResult = 0.0;   // Computation result (float for division)
 
-//       Forward declarations (need to be visible to other modules)
+//  Forward declarations (need to be visible to other modules)
 // These are declared here but implemented below, and called from the main sketch
 void enterCalcState(CalcState next);
 void handleCalculator(unsigned long now);
 
-//       Calculator helper: map pot to operation
+//  Calculator helper: map pot to operation
 static char mapPotToOp(int pot) {
   if (pot < 256)       return '+';
   else if (pot < 512)  return '-';
@@ -36,7 +36,7 @@ static char mapPotToOp(int pot) {
   else                 return '/';
 }
 
-//       Calculator sub-handler forward declarations
+//  Calculator sub-handler forward declarations
 static void handleCalcTitle(unsigned long now);
 static void handleCalcIntro(unsigned long now);
 static void handleCalcSelectAIntro(unsigned long now);
@@ -47,7 +47,7 @@ static void handleCalcSelectOpIntro(unsigned long now);
 static void handleCalcSelectOp(unsigned long now);
 static void handleCalcResult(unsigned long now);
 
-//       Implementations
+//  Implementations
 
 // External references to shared state (defined in main sketch)
 extern rgb_lcd lcd;
@@ -100,7 +100,7 @@ void handleCalculator(unsigned long now) {
   }
 }
 
-//       Calculator sub-handlers
+//  Calculator sub-handlers
 
 // State 1 – "Calculator Program" for 1 s, then advance.
 static void handleCalcTitle(unsigned long now) {
@@ -210,7 +210,7 @@ static void handleCalcSelectOp(unsigned long now) {
   }
 }
 
-//       Result formatting helpers
+//  Result formatting helpers
 
 // Inserts commas into a string of digits with an optional leading '-'.
 // E.g. "1000000" -> "1,000,000", "-1000" -> "-1,000", "999" -> "999"
@@ -231,7 +231,7 @@ static void addCommasToIntStr(const char* digits, char* out) {
 // Formats a float result into out[] (must be ≥ 17 bytes):
 //   Integer: no decimal point, commas every 3 digits  e.g. "1,000,000"
 //   Non-integer: integer part with commas + '.' + as many decimal digits as
-//                fit within 14 total characters (float precision capped at 6)
+//           fit within 14 total characters (float precision capped at 6)
 static void formatCalcResult(float result, char* out) {
   const int MAX_CHARS = 14;
   long longVal = (long)result;
@@ -299,7 +299,7 @@ static void handleCalcResult(unsigned long now) {
 
   // Display result on bottom line.
   // Layout: result (≤14 chars) + " " + celebChar  — OR —
-  //         first 14 chars + ".." when result exceeds 14 chars.
+  //    first 14 chars + ".." when result exceeds 14 chars.
   lcd.setCursor(0, 1);
   if (len > 14) {
     // Truncate to 14 chars and fill cols 14-15 with ".."

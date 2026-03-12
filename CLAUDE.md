@@ -28,7 +28,7 @@ Built for classroom demonstrations of algorithms and utilities.
 - Keep all display output within 16x2 LCD constraints
 - Use descriptive state enum names (e.g., `CALC_SELECT_A`, `PRIMES_COMPUTING`)
 - Use American English spelling in all comments and strings (e.g., "color" not "colour")
-- Do not use `──` or similar box-drawing characters as decorators in comments; plain `//       Section name` (7 spaces) is the correct style for section headers. The `══` style block separators are fine and should be kept.
+- Do not use `──` or similar box-drawing characters as decorators in comments; plain `//  Section name` (2 spaces) is the correct style for section headers. The `══` style block separators are fine and should be kept.
 
 ### Display Management
 - Clear lines only when necessary (avoid flicker)
