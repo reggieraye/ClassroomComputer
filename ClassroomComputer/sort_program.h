@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-//       Sort Test program states
+//  Sort Test program states
 enum SortTestState {
   SORT_TITLE,        // "Sort Test" for 0.75 s
   SORT_QUESTION,     // "Bubble or merge: / which is faster?" for 1.5 s
@@ -15,7 +15,7 @@ enum SortTestState {
   SORT_WINNER        // "Merge sort is / the winner! X" for 2 s
 };
 
-//       Sort-specific state
+//  Sort-specific state
 static SortTestState sortState = SORT_TITLE;
 static int           confirmedN = 10;        // N locked in when leaving SORT_SHOW_N
 static unsigned long bubbleDuration = 0;     // µs
@@ -23,12 +23,12 @@ static unsigned long mergeDuration  = 0;     // µs
 static int           sortBuf[500];           // scratch buffer (max N = 500)
 static int           mergeTmp[500];          // merge sort temp buffer
 
-//       Forward declarations (need to be visible to other modules)
+//  Forward declarations (need to be visible to other modules)
 // These are declared here but implemented below, and called from the main sketch
 void enterSortState(SortTestState next);
 void handleSortTest(unsigned long now);
 
-//       Sort algorithm helpers
+//  Sort algorithm helpers
 static void bubbleSort(int* a, int n) {
   for (int i = 0; i < n - 1; i++)
     for (int j = 0; j < n - 1 - i; j++)
@@ -47,7 +47,7 @@ static void mergeSortHelper(int* a, int* tmp, int n) {
   for (int x = 0; x < n; x++) a[x] = tmp[x];
 }
 
-//       Sort sub-handler forward declarations
+//  Sort sub-handler forward declarations
 static void handleSortTitle(unsigned long now);
 static void handleSortQuestion(unsigned long now);
 static void handleSortSelectSize(unsigned long now);
@@ -57,7 +57,7 @@ static void handleSortRunning(unsigned long now);
 static void handleSortResults(unsigned long now);
 static void handleSortWinner(unsigned long now);
 
-//       Implementations
+//  Implementations
 
 // External references to shared state (defined in main sketch)
 extern rgb_lcd lcd;
@@ -109,7 +109,7 @@ void handleSortTest(unsigned long now) {
   }
 }
 
-//       Sort sub-handlers
+//  Sort sub-handlers
 
 // State 1 – "Sort Test" for 1.75 s, then advance.
 // Only 9 chars so no scrolling needed.

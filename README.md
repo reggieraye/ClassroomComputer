@@ -1,12 +1,14 @@
 # Classroom Computer
 
-An Arduino-based educational computer that demonstrates algorithms and provides interactive utilities. Features a 16x2 LCD display, potentiometer control, and audio feedback.
+The Classroom Computer is very nearly the simplest computer that a person can build. For information processing, it's got a basic Arduino. For output, it's got a basic two-line LCD display. And for input, there's a simple knob. But due to the unreasonable power of digital logic, you can do a lot with a setup this limited. As I told the students for whom this computer was built, it still has over an order of magnitude more processing power than the Apollo 11 computer that landed men on the moon. 
 
-![Classroom Computer](link-to-photo-placeholder)
+In any event, I would encourage you to make a version of it yourself for two primary reasons. First, it gives one a palpable sense of what a computer is and does. Second, it provides a great platform, or proving ground, for you to code your own programs. If they can work effectively in this context, they will surely work in more featureful environments. 
+
+![Classroom Computer](https://uc5df8b3b54bc1d7273e9425a4cd.previews.dropboxusercontent.com/p/thumb/AC8SyaFIEgAePWFLLuwEgHm_0AQT2P_FjcyzJuh_DlHKhGnGiyFk46KQP_qjZ0N4cTIN_lorPlz1fzkbFt_1EBnZWybzuRTsxDbI3p9Nh1AxWpLGEv0rXAQJN6jfbj-L1BCZGO7m5h77KPTDFT60sFd3v43G-RYDQe6VJ0KQzcJQn2sl-aDsAbnrPpQxopl5RQL_ARVUcpXmLTWmUjmCH4ltBBQAgx-q-unNPv4KJB0HwuLTVRHqFDWai-Wu5lCCzEMqfxJBX4Cg3cRU-uASxFJ8P8wNwyIUrfEHgmQ7rlituA2jNS3iJ5CjP9ZLtJQVxqKyDimv4yvOv62g6FI8VACVI9eUO0QgOO0P2K9x20bMGtOO1KLnZfjqP1aZxJVmLKunYntaTw706Y5Z0252xGKD/p.jpeg?is_prewarmed=true)
 
 ## What It Does
 
-The Classroom Computer runs three interactive programs:
+The Classroom Computer runs some number of interactive programs. Among the programs created so far are:
 
 1. **Sort Test** - Visualizes bubble sort algorithm with timing display
 2. **Prime Finder** - Finds prime numbers in the range 1-1000
@@ -22,12 +24,13 @@ Navigate between programs using the potentiometer slider, then use the same slid
 - Linear potentiometer (10kΩ recommended)
 - Small speaker (2-lead piezo or magnetic)
 - Jumper wires
-- Breadboard (optional, for prototyping)
 
 ### Enclosure
-- Laser-cut acrylic or wood panels ([CAD files](link-placeholder))
-- M3 screws and standoffs
-- USB cable (Type-C for R4 Minima)
+- 1/8 in (3 mm) laser-cut acrylic or wood panels 
+- 4x M3 screws and nuts
+- USB cable (type-C for R4 Minima)
+- USB Li-Ion power nank with 5V Outputs @ 2.1A - 5000mAh (from Adafruit)
+- Select finger joints were bonded with weld-on acrylic
 
 ## Build Instructions
 
@@ -73,60 +76,23 @@ Navigate between programs using the potentiometer slider, then use the same slid
 3. Mount LCD in front panel cutout
 4. Mount potentiometer in side panel
 5. Secure speaker inside enclosure
-6. Assemble panels and secure with screws
+6. Assemble panels and secure with screws and weld-on (sparingly)
 
 ## How to Use
 
 ### Starting Up
-Power on the Arduino via USB or external power supply. The welcome screen appears for 3 seconds, then the program selection menu loads.
+Power on the Arduino via USB or external power supply. The welcome screen appears for ~3 seconds, then the program selection menu loads.
 
 ### Selecting a Program
-Move the potentiometer slider:
-- **Left third**: Sort Test
-- **Middle third**: Prime Finder
-- **Right third**: Calculator
-
-Hold the slider in position for 0.5 seconds to lock in your selection.
-
-### Program Controls
-
-**Sort Test:**
-1. Select array size (1-50) with slider
-2. Watch the sort visualization
-3. See timing results
-4. Returns to menu automatically
-
-**Prime Finder:**
-1. Select a number (1-1000) with slider
-2. Computer determines if it's prime
-3. If composite, shows smallest factor
-4. Returns to menu automatically
-
-**Calculator:**
-1. Select first number A (1-1000) with slider
-2. Select second number B (1-1000) with slider
-3. Select operation with slider (quartiles: +, -, ×, ÷)
-4. See the result with celebration animation
-5. Returns to menu automatically
-
-## Customization
-
-Want to add your own programs? See [CLAUDE.md](CLAUDE.md) for development guidelines and architecture details.
+Move the potentiometer slider to select program. Note that if write your own programs, you will have to manually specify which percent of the slider range maps to which program.
 
 ## Files
 
 - **Firmware**: `ClassroomComputer/` directory
-- **CAD Files**: [link-placeholder] (Fusion 360, STEP format)
-- **Laser Cut Files**: [link-placeholder] (SVG, DXF format)
+- **CAD**: [Onshape project](https://cad.onshape.com/documents/2c616913ed35852bc2abee61/w/cb143e35db52d72bd43e4b08/e/0127d00eb2454f0f71ede743?renderMode=0&uiState=69b31ef32c020ddc21038ab5)
+- **Laser Cut Files**: [The Adobe Illustrator files in this folder](https://www.dropbox.com/scl/fo/buwry2dpekuhzvbac7raz/AEnpvI6yAWcVBEK0AMFHpDo?rlkey=oy1yj3bhf98fbxmac3mu35kar&st=710h4esm&dl=0)
 
 ## License
 
-This project is open source. [License details TBD]
+This project is licensed under the MIT License. Put simnply, you may use it and adapt it as you wish, but you must credit this project. 
 
-## Credits
-
-Built with Arduino and the Grove RGB LCD library.
-
-## Questions?
-
-[Contact info or issue tracker placeholder]

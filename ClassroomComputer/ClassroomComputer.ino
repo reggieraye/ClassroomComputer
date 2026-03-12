@@ -32,7 +32,7 @@ rgb_lcd lcd;
 const int POT_PIN    = A0;
 const int BUZZER_PIN = 8;
 
-//       Backlight colours
+//  Backlight colours
 const byte COL_PINK[3]  = {255,   0, 128};
 const byte COL_GREEN[3] = {  0, 255,   0};
 
@@ -40,16 +40,16 @@ const byte COL_GREEN[3] = {  0, 255,   0};
 // SHARED STATE & CONFIGURATION
 // ══════════════════════════════════════════════════════════════════════════════
 
-//       Scroll speed: 1 (slowest) – 5 (fastest)
+//  Scroll speed: 1 (slowest) – 5 (fastest)
 int scrollSpeed = 3;
 
-//       Delay before scrolling begins after entering a state
+//  Delay before scrolling begins after entering a state
 const unsigned long SCROLL_START_DELAY = 750UL;
 
-//       Cooldown between page transitions (prevents jump-through)
+//  Cooldown between page transitions (prevents jump-through)
 const unsigned long PAGE_TRANSITION_COOLDOWN = 900UL;
 
-//       Top-level application states
+//  Top-level application states
 enum AppState {
   APP_WELCOME,
   APP_PROGRAM_SELECT,
@@ -62,33 +62,33 @@ enum AppState {
 
 AppState appState = APP_WELCOME;
 
-//       Timing
+//  Timing
 unsigned long stateEnteredAt = 0;   // millis() when current state began
 unsigned long potLastMovedAt = 0;   // millis() of last pot movement
 unsigned long scrollTickAt   = 0;   // millis() of next scroll step
 
-//       Potentiometer
+//  Potentiometer
 int  potValue         = 0;
 int  potValuePrev     = -1;    // -1 = no previous reading (sentinel)
 bool potHasMoved      = false; // has pot moved since entering current state?
 int  remappedPotValue = 10;    // pot value mapped to [10, 350]
 
-//       Program selection page (1, 2, or 3)
+//  Program selection page (1, 2, or 3)
 int selectionPage = 1;
 unsigned long pageChangedAt = 0;  // millis() of last page transition
 
-//       Movement gate: blocks selection on pages 2+ until intentional pot movement
+//  Movement gate: blocks selection on pages 2+ until intentional pot movement
 int  potValueAtPageChange = 0;     // pot snapshot when page changed
 bool selectionGateOpen    = true;  // true = selection allowed
 const int GATE_MOVEMENT_THRESHOLD = 50;  // pot units required to open gate
 
-//       Welcome jingle state
+//  Welcome jingle state
 bool welcomeJinglePlayed = false;
 
-//       Scroll state
+//  Scroll state
 int scrollOffset = 0;   // leading-character index into the scroll string
 
-//       Celebratory animation frames
+//  Celebratory animation frames
 // Slot 0 is overwritten each animation tick.
 // Phase 1 – pulsing diamond (frames 0-2)
 byte celebFrame0[8] = { 0b00100, 0b01110, 0b11111, 0b11111, 0b01110, 0b00100, 0b00000, 0b00000 };
@@ -105,26 +105,26 @@ const int     CELEB_FRAME_COUNT = 8;
 int           celebFrameIdx = 0;
 unsigned long celebTickAt   = 0;
 
-//       Micro (µ) symbol custom character
+//  Micro (µ) symbol custom character
 // Custom character slot 1 = µ (mu) for microseconds display
 byte microChar[8] = { 0b00000, 0b01010, 0b01010, 0b01010, 0b01110, 0b01000, 0b01000, 0b00000 };
 
-//       Rightwards arrow (→) custom character
+//  Rightwards arrow (→) custom character
 // Custom character slot 2 = → (arrow) for program selection display
 byte arrowChar[8] = { 0b00000, 0b00100, 0b00010, 0b11111, 0b00010, 0b00100, 0b00000, 0b00000 };
 
-//       Leftwards arrow (←) custom character
+//  Leftwards arrow (←) custom character
 // Custom character slot 3 = ← (left arrow) for program selection display
 byte leftArrowChar[8] = { 0b00000, 0b00100, 0b01000, 0b11111, 0b01000, 0b00100, 0b00000, 0b00000 };
 
-//       Pot deadband – absorbs ADC noise
+//  Pot deadband – absorbs ADC noise
 const int POT_DEADBAND = 8;
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SHARED HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
 
-//       Scroll helper
+//  Scroll helper
 // Renders a 16-char window of str on the given LCD row, advancing one character
 // per tick.  scrollSpeed 0 = 100 ms/step (fastest), 5 = 350 ms/step (slowest).
 // Uses globals scrollOffset and scrollTickAt.
@@ -155,7 +155,7 @@ void tickScroll(const char* str, uint8_t row, unsigned long now, int wrapGap = 4
   }
 }
 
-//       Celebration sound helper
+//  Celebration sound helper
 // Non-blocking ascending jingle. Call each loop iteration during celebration.
 // Auto-resets when stateEnteredAt changes.
 void tickCelebrationSound(unsigned long now) {
@@ -184,7 +184,7 @@ void tickCelebrationSound(unsigned long now) {
   }
 }
 
-//       State-transition helper
+//  State-transition helper
 // Common bookkeeping whenever we move to a new top-level state.
 void enterAppState(int next) {
   appState       = (AppState)next;
@@ -242,7 +242,7 @@ void setup() {
 void loop() {
   unsigned long now = millis();
 
-  //       Read pot and detect movement
+  //  Read pot and detect movement
   potValue = analogRead(POT_PIN);
   if (abs(potValue - potValuePrev) > POT_DEADBAND) {
     potLastMovedAt = now;
@@ -251,7 +251,7 @@ void loop() {
   }
   remappedPotValue = map(potValue, 0, 1023, 10, 350);
 
-  //       Dispatch to current state handler
+  //  Dispatch to current state handler
   switch (appState) {
     case APP_WELCOME:        handleWelcome(now);       break;
     case APP_PROGRAM_SELECT: handleProgramSelect(now); break;
@@ -267,7 +267,7 @@ void loop() {
 // ORCHESTRATOR SCREENS
 // ══════════════════════════════════════════════════════════════════════════════
 
-//       handleWelcome
+//  handleWelcome
 // Layout: 0.75 s static, then 6 s scrolling (wrap gap 4). Total = 6.75 s.
 void handleWelcome(unsigned long now) {
   const char* msg = "Welcome to the Classroom Computer!";
@@ -300,7 +300,7 @@ void handleWelcome(unsigned long now) {
   }
 }
 
-//       handleProgramSelect
+//  handleProgramSelect
 void handleProgramSelect(unsigned long now) {
   const char* msg = "Use slider to select program";
 
@@ -311,7 +311,7 @@ void handleProgramSelect(unsigned long now) {
     tickScroll(msg, 0, now, 4, true);
   }
 
-  //       Handle page transitions based on pot position
+  //  Handle page transitions based on pot position
   // Only allow transitions after cooldown period to prevent jump-through
   if (now - pageChangedAt >= PAGE_TRANSITION_COOLDOWN) {
     if (selectionPage == 1) {
@@ -346,7 +346,7 @@ void handleProgramSelect(unsigned long now) {
     }
   }
 
-  //       Display bottom line based on current page
+  //  Display bottom line based on current page
   lcd.setCursor(0, 1);
   if (selectionPage == 1) {
     lcd.print("Sort | Primes  ");  // 15 chars
@@ -360,14 +360,14 @@ void handleProgramSelect(unsigned long now) {
     lcd.print(" Game | ASI    ");   // 15 chars (positions 2-16)
   }
 
-  //       Open movement gate once pot moves far enough from page-change position
+  //  Open movement gate once pot moves far enough from page-change position
   if (!selectionGateOpen && abs(potValue - potValueAtPageChange) > GATE_MOVEMENT_THRESHOLD) {
     selectionGateOpen = true;
     potHasMoved = true;          // count the gate-opening move as valid movement
     potLastMovedAt = now;        // restart the hold timer from this point
   }
 
-  //       Handle program selection after 625ms hold
+  //  Handle program selection after 625ms hold
   if (potHasMoved && (now - potLastMovedAt >= 625UL)) {
     if (selectionPage == 1) {
       if (potValue <= 409) {        // 0-40% → Sort
