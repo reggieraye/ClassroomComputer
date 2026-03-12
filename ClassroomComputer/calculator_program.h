@@ -18,8 +18,8 @@ enum CalcState {
 
 //  Calculator-specific state
 static CalcState calcState = CALC_TITLE;
-static int       calcA     = 1;      // First number (1-1000)
-static int       calcB     = 1;      // Second number (1-1000)
+static int       calcA     = 1;      // First number (1-100)
+static int       calcB     = 1;      // Second number (1-100)
 static char      calcOp    = '+';    // Operation: '+', '-', '*', '/'
 static float     calcResult = 0.0;   // Computation result (float for division)
 
@@ -139,9 +139,9 @@ static void handleCalcSelectAIntro(unsigned long now) {
 }
 
 // State 4 – "A = [remappedPotValue]" until slider static for 2.5 s.
-// Map pot 0-1023 to 1-1000 locally for calculator.
+// Map pot 0-1023 to 1-100 locally for calculator.
 static void handleCalcSelectA(unsigned long now) {
-  int displayValue = map(potValue, 0, 1023, 1, 1000);
+  int displayValue = map(potValue, 0, 1023, 1, 100);
 
   lcd.setCursor(0, 0);
   lcd.print("A = ");
@@ -167,9 +167,9 @@ static void handleCalcSelectBIntro(unsigned long now) {
 }
 
 // State 6 – "B = [remappedPotValue]" until slider static for 2.5 s.
-// Map pot 0-1023 to 1-1000 locally for calculator.
+// Map pot 0-1023 to 1-100 locally for calculator.
 static void handleCalcSelectB(unsigned long now) {
-  int displayValue = map(potValue, 0, 1023, 1, 1000);
+  int displayValue = map(potValue, 0, 1023, 1, 100);
 
   lcd.setCursor(0, 0);
   lcd.print("B = ");
